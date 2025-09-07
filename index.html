@@ -835,7 +835,7 @@
                 <h3 data-i18n="examples_hint">💡 Try:</h3>
                 <ul>
                     <li data-date="1.1.1" data-i18n="example_1">1.1.1 – start of our era</li>
-                    <li data-date="15.3.44" data-i18n="example_2">15.3.44 – Caesar's death</li>
+                    <li data-date="15.3.044" data-i18n="example_2">15.3.44 – Caesar's death</li>
                     <li data-date="4.10.1582" data-i18n="example_3">4.10.1582 – last day of the Julian calendar</li>
                     <li data-date="15.10.1582" data-i18n="example_4">15.10.1582 – first day of the Gregorian calendar</li>
                     <li data-date="8.10.1582" data-i18n="example_5">8.10.1582 – non-existent date during the transition</li>
@@ -1753,7 +1753,7 @@ rr = r;
 }
 var k = rr % 100;
 var j = Math.floor(rr / 100);
-h = ((d + Math.floor((13 * (me + 1)) / 5) + k + Math.floor(k / 4) + Math.floor(j / 4) - (2 * j)) % 7 + 7) % 7;
+h = (((d + Math.floor((13 * (me + 1)) / 5) + k + Math.floor(k / 4) + Math.floor(j / 4) - (2 * j)) % 7 + 7)-1) % 7;
 
 // Použití optimalizované funkce getWeekdayName
 var weekdayName = getWeekdayName(h); // Gregoriánský index
