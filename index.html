@@ -1,0 +1,4544 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head></head>
+<body>
+    <div class="debug-info">
+        Deepseek verze - smazat tento řádek v produkční verzi 2025-08-30 opraveny zývažné chyby, teď funkční. Zbývá dokončit překlady - hotovo. Jinak, zdá se, OK. Jen refresh se projeví až napodruhé. A nově jsem vyřadil sw.js z URLS_TO_CACHE (a zase ho vrátil zpět). teďˇhapruje refresh, nebo ne? Už ne. ;)
+    </div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Komplexní kalendářní kalkulátor s astronomickými funkcemi - den v týdnu, fáze měsíce, sluneční události, pozice planet a mnoho dalšího">
+    <meta name="theme-color" content="#8B7355">
+    <meta name="background-color" content="#4A4A3A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="" data-i18n-content="app_title">
+    <meta name="msapplication-TileColor" content="#8B7355">
+    <meta name="msapplication-config" content="browserconfig.xml">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- PWA Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyBnaWQ9U2ltdWxhdG9yIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiPiA8ZGVmcz5OcmFvaWVudEN0cm1ibGUgaW5oZXJpdFhzZy5cX0Zyb20geCw0IHkuNS52MTkuOUgyMzQiLD5AdGFzLjIK18ksOzRjSEpBIGVudHJ1OjFrMUdiQztOZFhCbkFGZE12SGRtbVJRbk1qZ1JkZXN3UVE9PSI+PC9zdmc+">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzhCNzM1NSIvPgo8dGV4dCB4PSI1IiB5PSIyNCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIj7wn5OFPC90ZXh0Pgo8L3N2Zz4K">
+
+    <style>
+        .debug-info {
+            display: none;
+        }
+:root {
+            --bg-primary: linear-gradient(135deg, #8B7355 0%, #6B5B47 25%, #4A4A3A 50%, #5D4E37 75%, #8B7355 100%);
+            --bg-container: linear-gradient(145deg, rgba(139, 118, 76, 0.8) 0%, rgba(101, 67, 33, 0.9) 100%);
+            --border-main: rgba(205, 186, 150, 0.4);
+            --text-primary: #F5E6D3;
+            --text-accent: #CDBA96;
+            --control-bg: linear-gradient(145deg, rgba(15, 15, 15, 0.9) 0%, rgba(35, 35, 35, 0.8) 100%);
+            --control-border: rgba(60, 60, 60, 0.8);
+            --button-bg: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 30%, #0f0f0f 70%, #1a1a1a 100%);
+        }
+        .theme-blue {
+            --bg-primary: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #1e40af 50%, #2563eb 75%, #1e3a8a 100%);
+            --bg-container: linear-gradient(145deg, rgba(30, 58, 138, 0.8) 0%, rgba(37, 99, 235, 0.9) 100%);
+            --border-main: rgba(147, 197, 253, 0.4);
+            --text-primary: #dbeafe;
+            --text-accent: #93c5fd;
+        }
+        .theme-green {
+            --bg-primary: linear-gradient(135deg, #14532d 0%, #16a34a 25%, #15803d 50%, #22c55e 75%, #14532d 100%);
+            --bg-container: linear-gradient(145deg, rgba(20, 83, 45, 0.8) 0%, rgba(21, 128, 61, 0.9) 100%);
+            --border-main: rgba(134, 239, 172, 0.4);
+            --text-primary: #dcfce7;
+            --text-accent: #86efac;
+        }
+        .theme-purple {
+            --bg-primary: linear-gradient(135deg, #581c87 0%, #a855f7 25%, #7c3aed 50%, #8b5cf6 75%, #581c87 100%);
+            --bg-container: linear-gradient(145deg, rgba(88, 28, 135, 0.8) 0%, rgba(124, 58, 237, 0.9) 100%);
+            --border-main: rgba(196, 181, 253, 0.4);
+            --text-primary: #f3e8ff;
+            --text-accent: #c4b5fd;
+        }
+        .theme-red {
+            --bg-primary: linear-gradient(135deg, #7f1d1d 0%, #dc2626 25%, #b91c1c 50%, #ef4444 75%, #7f1d1d 100%);
+            --bg-container: linear-gradient(145deg, rgba(127, 29, 29, 0.8) 0%, rgba(185, 28, 28, 0.9) 100%);
+            --border-main: rgba(252, 165, 165, 0.4);
+            --text-primary: #fef2f2;
+            --text-accent: #fca5a5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 10px;
+            color: var(--text-primary);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--bg-container);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid var(--border-main);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .menu-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .menu-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--button-bg);
+            border: 2px solid var(--control-border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
+            -webkit-user-select: none;
+            user-select: none;
+            z-index: 101;
+        }
+
+        .menu-button:active {
+            transform: scale(0.95);
+            background: rgba(50, 50, 50, 0.8);
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            min-width: 320px;
+            max-width: calc(100vw - 40px);
+            background: var(--control-bg);
+            border: 2px solid var(--control-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+        .menu-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: block;
+        }
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            display: none;
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+        .menu-section {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(80, 80, 80, 0.3);
+        }
+
+        .menu-section:last-child {
+            border-bottom: none;
+        }
+
+        .menu-section-title {
+            padding: 8px 16px;
+            color: var(--text-accent);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item, .theme-item {
+            padding: 12px 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px;
+        }
+
+        .menu-item:active, .theme-item:active {
+            background: rgba(60, 60, 60, 0.6);
+            color: var(--text-accent);
+        }
+
+        .menu-item.has-submenu {
+            justify-content: space-between;
+        }
+
+        .menu-item.has-submenu::after {
+            content: "▶";
+            font-size: 12px;
+            color: var(--text-accent);
+        }
+
+        .submenu {
+            display: none;
+            background: rgba(25, 25, 25, 0.95);
+            border-left: 3px solid var(--border-main);
+            margin-top: 8px;
+            border-radius: 8px;
+        }
+
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu .menu-item {
+            padding-left: 24px;
+            font-size: 14px;
+        }
+
+        .theme-item {
+            gap: 10px;
+        }
+
+        .theme-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+.submenu .theme-item {
+    padding-left: 24px;
+    font-size: 14px;
+}
+
+.submenu .theme-preview {
+    width: 20px;
+    height: 20px;
+}
+
+
+        .theme-bronze .theme-preview {
+            background: linear-gradient(45deg, #8B7355, #CDBA96);
+        }
+
+        .theme-blue .theme-preview {
+            background: linear-gradient(45deg, #3b82f6, #93c5fd);
+        }
+
+        .theme-green .theme-preview {
+            background: linear-gradient(45deg, #16a34a, #86efac);
+        }
+
+        .theme-purple .theme-preview {
+            background: linear-gradient(45deg, #a855f7, #c4b5fd);
+        }
+
+        .theme-red .theme-preview {
+            background: linear-gradient(45deg, #dc2626, #fca5a5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 15px;
+            padding-right: 60px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            line-height: 1.2;
+        }
+
+        .header p {
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 400;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .display {
+            background: var(--control-bg);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid var(--control-border);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .display.result {
+            background: linear-gradient(145deg, rgba(20, 60, 20, 0.9) 0%, rgba(30, 80, 30, 0.8) 100%);
+            border-color: rgba(100, 150, 100, 0.6);
+        }
+
+        .display.error {
+            background: linear-gradient(145deg, rgba(60, 20, 20, 0.9) 0%, rgba(80, 30, 30, 0.8) 100%);
+            border-color: rgba(150, 100, 100, 0.6);
+        }
+
+        .display-text {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .calculator-view {
+            display: none;
+        }
+
+        .calculator-view.active {
+            display: block;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .date-input-container {
+            margin-bottom: 18px;
+        }
+
+        .date-input, .number-input, .location-input {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid var(--control-border);
+            border-radius: 12px;
+            background: var(--control-bg);
+            color: var(--text-primary);
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+            font-weight: 500;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            -webkit-appearance: none;
+            min-height: 56px;
+        }
+
+        .date-input:focus, .number-input:focus, .location-input:focus {
+            border-color: var(--border-main);
+        }
+
+        .date-input::placeholder, .number-input::placeholder, .location-input::placeholder {
+            color: rgba(180, 180, 180, 0.7);
+            font-weight: 400;
+        }
+
+        .format-hint {
+            font-size: 13px;
+            color: var(--text-accent);
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--button-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--control-border);
+            border-radius: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 56px;
+            -webkit-appearance: none;
+            margin-bottom: 15px;
+        }
+
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .examples {
+            margin-top: 20px;
+            background: var(--control-bg);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid var(--control-border);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .examples h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-accent);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .examples ul {
+            list-style: none;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .examples li {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 400;
+            opacity: 0.9;
+            cursor: pointer;
+            padding: 8px 4px;
+            border-radius: 6px;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .examples li:active {
+            color: var(--text-accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .examples li::before {
+            content: "→ ";
+            color: var(--text-accent);
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(245, 230, 211, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-primary);
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .input-col {
+            flex: 1;
+        }
+
+        .back-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--control-bg);
+            color: var(--text-accent);
+            border: 2px solid var(--control-border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 20px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .back-button:active {
+            transform: scale(0.98);
+        }
+
+        /* PWA installation prompt styles */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--bg-container);
+            border: 2px solid var(--border-main);
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .install-prompt.show {
+            display: block;
+        }
+
+        .install-prompt-text {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .install-btn, .dismiss-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--control-border);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .install-btn {
+            background: var(--button-bg);
+            color: var(--text-primary);
+        }
+
+        .dismiss-btn {
+            background: var(--control-bg);
+            color: var(--text-accent);
+        }
+
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.offline {
+            background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+            color: white;
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .connection-status.online {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Standalone app adjustments */
+        @media (display-mode: standalone) {
+            .connection-status {
+                top: 30px;
+                /* Account for status bar in standalone mode */
+            }
+
+            body {
+                padding-top: 5px;
+                /* Extra padding for standalone */
+            }
+        }
+
+        // NAHRADIT za:
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .date-input, .number-input, .location-input {
+                font-size: 16px;
+                padding: 16px;
+            }
+            .calculate-btn {
+                font-size: 16px;
+                padding: 16px;
+            }
+            .menu-dropdown {
+                min-width: 280px;
+                right: -5px;
+                max-width: calc(100vw - 20px);
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .menu-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                min-width: auto;
+                max-width: none;
+            }
+        }
+    </style>
+
+
+
+    <script src="i18n.js"></script>
+    <script>
+        // Inicializace i18n hned po startu
+        initI18n();
+    </script>
+    <div class="header">
+        <h1 data-i18n="app_title">Kalendářní kalkulátor</h1>
+        <p data-i18n="app_info">
+            Komplexní kalendářní kalkulátor s astronomickými funkcemi
+        </p>
+    </div>
+    <!-- Jazykové menu -->
+    <div id="lang-dropdown" style="display:flex;gap:4px;align-items:center;justify-content:center;margin:4px 0;">
+        <span data-i18n="lang_menu">Jazyk </span>:
+        <p>
+            <button onclick="changeLang('cs')" title="Čeština" aria-label="Čeština" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇨🇿</button>
+            <button onclick="changeLang('en')" title="English" aria-label="English" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇬🇧</button>
+            <button onclick="changeLang('de')" title="Deutsch" aria-label="Deutsch" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇩🇪</button>
+            <button onclick="changeLang('fr')" title="Français" aria-label="Français" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇫🇷</button>
+            <button onclick="changeLang('es')" title="Español" aria-label="Español" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇪🇸</button>
+            <button onclick="changeLang('ru')" title="Русский" aria-label="Русский" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇷🇺</button>
+            <button onclick="changeLang('uk')" title="Українська" aria-label="Українська" style="font-size:18px;padding:8px 12px;border:2px solid var(--control-border);border-radius:8px;background:var(--control-bg);min-width:44px;min-height:44px;">🇺🇦</button>
+        </p>
+    </div>
+
+    <!-- Connection status indicator -->
+    <div id="connectionStatus" class="connection-status" style="cursor: pointer;">
+    </div>
+
+    <!-- PWA Install prompt -->
+    <!-- PWA Install prompt - optimalizovaný -->
+    <div id="installPrompt" class="install-prompt">
+        <div class="install-prompt-text" data-i18n="install_prompt_text">
+            📱 Install the Calendar Calculator as an app for faster access and offline functionality!
+        </div>
+        <div class="install-buttons">
+            <div class="install-btn" id="installBtn" data-i18n="install_button">
+                Install
+            </div>
+            <div class="dismiss-btn" id="dismissBtn" data-i18n="dismiss_button">
+                Later
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay"></div>         <!-- SPRÁVNĚ - mimo menu-container -->
+    <div class="container">
+        <div class="menu-container">
+            <div class="menu-button" id="menuButton">
+                ⋮
+            </div>
+
+            <!-- Menu dropdown - optimalizované klíče -->
+            <div class="menu-dropdown" id="menuDropdown">
+                <div class="menu-section">
+                    <div class="menu-item" id="dayOfWeekMenu" data-i18n="menu_day_of_week">
+                        📅 Day of the week
+                    </div>
+                    <div class="menu-item" id="versionButton" data-i18n="version_info">
+                        Calendar Calculator PWA
+                    </div>
+                    <div class="menu-item has-submenu" id="calculatorsMenu" data-i18n="calculators_menu">
+                        🧮 More calculations
+                    </div>
+                    <div class="submenu" id="calculatorsSubmenu">
+                        <div class="menu-item" data-calculator="year-finder" data-i18n="menu_year_finder">
+                            🔍 Year finder
+                        </div>
+                        <div class="menu-item" data-calculator="calendar-converter" data-i18n="menu_calendar_converter">
+                            🔄 Calendar converter
+                        </div>
+                        <div class="menu-item" data-calculator="easter" data-i18n="menu_easter">
+                            🥚 Easter
+                        </div>
+                        <div class="menu-item" data-calculator="moon-phase" data-i18n="menu_moon_phase">
+                            🌙 Moon phase
+                        </div>
+                        <div class="menu-item" data-calculator="date-math" data-i18n="menu_date_math">
+                            ➕ Date arithmetic
+                        </div>
+                    </div>
+
+                    <div class="menu-item has-submenu" id="astronomyMenu" data-i18n="astronomy_menu">
+                        🌟 Astronomical calculations
+                    </div>
+                    <div class="submenu" id="astronomySubmenu">
+                        <div class="menu-item" data-calculator="sun-events" data-i18n="menu_sun_events">
+                            ☀️ Sun events
+                        </div>
+                        <div class="menu-item" data-calculator="planet-positions" data-i18n="menu_planet_positions">
+                            🪐 Planet positions
+                        </div>
+                        <div class="menu-item" data-calculator="eclipses" data-i18n="menu_eclipses">
+                            🌑 Eclipses
+                        </div>
+                        <div class="menu-item" data-calculator="sidereal-time" data-i18n="menu_sidereal_time">
+                            ⏰ Sidereal time
+                        </div>
+                    </div>
+
+<div class="menu-section">
+    <div class="menu-item has-submenu" id="themesMenu" data-i18n="colors_menu">🎨 Barevná témata</div>
+    <div class="submenu" id="themesSubmenu">
+        <div class="theme-item theme-bronze" data-theme="">
+            <div class="theme-preview"></div>
+            <p data-i18n="theme_bronze">Bronze (default)</p>
+        </div>
+        <div class="theme-item theme-blue" data-theme="theme-blue">
+            <div class="theme-preview"></div>
+            <p data-i18n="theme_blue">Blue</p>
+        </div>
+        <div class="theme-item theme-green" data-theme="theme-green">
+            <div class="theme-preview"></div>
+            <p data-i18n="theme_green">Green</p> 
+        </div>
+        <div class="theme-item theme-purple" data-theme="theme-purple">
+            <div class="theme-preview"></div>
+            <p data-i18n="theme_purple">Purple</p>
+        </div>
+        <div class="theme-item theme-red" data-theme="theme-red">
+            <div class="theme-preview"></div>
+            <p data-i18n="theme_red">Red</p>
+        </div>
+    </div>
+</div>
+
+                    <div class="menu-section">
+                        <div class="menu-item" data-link="https://claude.ai" data-i18n="created_by_claude">
+                            Created by Claude AI
+                        </div>
+                        <div class="menu-item" data-link="https://kalendar.beda.cz/kalendar-rozcestnik" data-i18n="more_about_calendars">
+                            More about calendars
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Day of Week Calculator -->
+        <!-- Day of Week Calculator - optimalizované -->
+        <div id="dayOfWeekCalculator" class="calculator-view active">
+            <div class="header">
+                <h2 data-i18n="menu_day_of_week">📅 Day of the week</h2>
+                <p data-i18n="find_weekday_hint">
+                    Find the day of the week for any date in history
+                </p>
+            </div>
+
+            <div id="display" class="display">
+                <div class="display-text" data-i18n="dayofweek_result_placeholder">
+                    Result will appear here
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label class="input-label" for="dateInput" data-i18n="enter_date_label">Enter date:</label>
+                <div class="date-input-container">
+                    <input type="text" id="dateInput" class="date-input" data-i18n-placeholder="date_placeholder" inputmode="numeric" maxlength="15" placeholder="1.1.1 or 15.3.44 or 01031989">
+                    <div class="format-hint" data-i18n="date_formats">
+                        Formats: 1.1.1 • 15.3.44 • 1989 • 1/3/1989 • 01031989
+                    </div>
+                </div>
+            </div>
+
+            <button id="calculateBtn" class="calculate-btn" data-i18n="calc">CALCULATE</button>
+
+            <div class="examples">
+                <h3 data-i18n="examples_hint">💡 Try:</h3>
+                <ul>
+                    <li data-date="1.1.1" data-i18n="example_1">1.1.1 – start of our era</li>
+                    <li data-date="15.3.44" data-i18n="example_2">15.3.44 – Caesar's death</li>
+                    <li data-date="4.10.1582" data-i18n="example_3">4.10.1582 – last day of the Julian calendar</li>
+                    <li data-date="15.10.1582" data-i18n="example_4">15.10.1582 – first day of the Gregorian calendar</li>
+                    <li data-date="8.10.1582" data-i18n="example_5">8.10.1582 – non-existent date during the transition</li>
+                    <li data-date="1.1.2000" data-i18n="example_6">1.1.2000 – turn of the millennium</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Year Finder Calculator -->
+        <!-- Year Finder Calculator - optimalizovaný select -->
+        <div id="yearFinderCalculator" class="calculator-view">
+            <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+                ← Back to main menu
+            </div>
+            <div class="header">
+                <h1 data-i18n="year_finder_title">🔍 Year finder</h1>
+                <p data-i18n="year_finder_description">
+                    Find years for a specific combination of day, month and day of the week
+                </p>
+            </div>
+
+            <div id="yearFinderDisplay" class="display">
+                <div class="display-text" data-i18n="year_finder_result_placeholder">
+                    Set parameters and view matching years
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-col">
+                    <label class="input-label" data-i18n="day_input_label">Day of the month:</label>
+                    <input type="number" id="yearFinderDay" class="number-input" placeholder="1-31" min="1" max="31">
+                </div>
+                <div class="input-col">
+                    <label class="input-label" data-i18n="month_input_label">Month:</label>
+                    <input type="number" id="yearFinderMonth" class="number-input" placeholder="1-12" min="1" max="12">
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label class="input-label" data-i18n="weekday_input_label">Day of the week:</label>
+                <select id="yearFinderDayOfWeek" class="date-input">
+                    <option value="" data-i18n="select_day">Select day</option>
+                    <option value="1" data-i18n="monday">Monday</option>
+                    <option value="2" data-i18n="tuesday">Tuesday</option>
+                    <option value="3" data-i18n="wednesday">Wednesday</option>
+                    <option value="4" data-i18n="thursday">Thursday</option>
+                    <option value="5" data-i18n="friday">Friday</option>
+                    <option value="6" data-i18n="saturday">Saturday</option>
+                    <option value="0" data-i18n="sunday">Sunday</option>
+                </select>
+            </div>
+
+            <button id="yearFinderBtn" class="calculate-btn" data-i18n="find_years_button">Find years</button>
+        </div>
+
+        <!-- Calendar Converter -->
+        <div id="calendarConverterCalculator" class="calculator-view">
+            <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+                ← Zpět na hlavní menu
+            </div>
+            <div class="header">
+                <h1 data-i18n="calendar_converter_title">🔄 Převod kalendářů</h1>
+                <p data-i18n="calendar_converter_description_full">
+                    Převod mezi gregoriánským a juliánským kalendářem
+                </p>
+            </p>
+        </div>
+        <div id="converterDisplay" class="display">
+            <div class="display-text" data-i18n="calendar_converter_result_placeholder">
+                Zadejte datum pro převod mezi kalendáři
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="date_format_ddmmyyyy">Datum (DD.MM.RRRR):</label>
+            <input type="text" id="converterDate" class="date-input" placeholder="15.10.1582" inputmode="numeric">
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="calendar_type">Typ kalendáře:</label>
+            <select id="converterType" class="date-input">
+                <option value="gregorian" data-i18n="gregorian_to_julian">Gregoriánský → Juliánský</option>
+                <option value="julian" data-i18n="julian_to_gregorian">Juliánský → Gregoriánský</option>
+            </select>
+        </div>
+        <button id="converterBtn" class="calculate-btn" data-i18n="convert_button">Převést</button>
+    </div>
+
+    <!-- Easter Calculator -->
+    <div id="easterCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Zpět na hlavní menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="easter_title">🥚 Velikonoce</h1>
+            <p data-i18n="easter_description_full">
+                Výpočet data Velikonoční neděle a souvisejících svátků
+            </p>
+        </div>
+        <div id="easterDisplay" class="display">
+            <div class="display-text" data-i18n="easter_result_placeholder">
+                Zadejte rok pro výpočet velikonočních svátků
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="year_label">Rok:</label>
+            <input type="number" id="easterYear" class="number-input" placeholder="2025" min="1" max="9999">
+        </div>
+        <button id="easterBtn" class="calculate-btn" data-i18n="calculate_easter">Vypočítat Velikonoce</button>
+    </div>
+
+    <!-- Moon Phase Calculator -->
+    <div id="moonPhaseCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Zpět na hlavní menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="moon_phase_title">🌙 Fáze Měsíce</h1>
+            <p data-i18n="moon_phase_description_full">
+                Zjistěte fázi Měsíce pro dané datum
+            </p>
+        </div>
+        <div id="moonDisplay" class="display">
+            <div class="display-text" data-i18n="moon_phase_result_placeholder">
+                Zadejte datum pro zjištění fáze Měsíce
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="date_format_ddmmyyyy">Datum (DD.MM.RRRR):</label>
+            <input type="text" id="moonDate" class="date-input" placeholder="6.7.2025" inputmode="numeric">
+        </div>
+        <button id="moonBtn" class="calculate-btn" data-i18n="calculate_phase">Vypočítat fázi</button>
+    </div>
+
+    <!-- Date Math Calculator -->
+    <div id="dateMathCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Zpět na hlavní menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="date_math_title">➕ Kalendářní aritmetika</h1>
+            <p data-i18n="date_math_description_full">
+                Přičítání/odčítání dnů a výpočet rozdílů mezi daty
+            </p>
+        </div>
+        <div id="dateMathDisplay" class="display">
+            <div class="display-text" data-i18n="date_math_result_placeholder">
+                Vyberte typ výpočtu a zadejte data
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="calculation_type">Typ výpočtu:</label>
+            <select id="mathType" class="date-input">
+                <option value="add" data-i18n="add_days_to_date">Přičíst dny k datu</option>
+                <option value="diff" data-i18n="date_difference">Rozdíl mezi daty</option>
+            </select>
+        </div>
+        <div id="addOperation" class="input-section">
+            <div class="input-row">
+                <div class="input-col">
+                    <label class="input-label" data-i18n="date_label">Datum:</label>
+                    <input type="text" id="mathDate1" class="date-input" placeholder="1.1.2025" inputmode="numeric">
+                </div>
+                <div class="input-col">
+                    <label class="input-label" data-i18n="days_plus_minus">Dny (+/-):</label>
+                    <input type="number" id="mathDays" class="number-input" placeholder="100">
+                </div>
+            </div>
+        </div>
+        <div id="diffOperation" class="input-section" style="display: none;">
+            <div class="input-row">
+                <div class="input-col">
+                    <label class="input-label" data-i18n="from_date">Od data:</label>
+                    <input type="text" id="mathDate2" class="date-input" placeholder="1.1.2025" inputmode="numeric">
+                </div>
+                <div class="input-col">
+                    <label class="input-label" data-i18n="to_date">Do data:</label>
+                    <input type="text" id="mathDate3" class="date-input" placeholder="31.12.2025" inputmode="numeric">
+                </div>
+            </div>
+        </div>
+        <button id="dateMathBtn" class="calculate-btn" data-i18n="calculate_button">Vypočítat</button>
+    </div>
+
+    <!-- Sun Events Calculator -->
+    <div id="sunEventsCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Zpět na hlavní menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="sun_events_title">☀️ Sluneční události</h1>
+            <p data-i18n="sun_events_description_full">
+                Východ, západ slunce a délka dne pro zadané místo
+            </p>
+        </div>
+        <div id="sunEventsDisplay" class="display">
+            <div class="display-text" data-i18n="sun_events_result_placeholder">
+                Zadejte datum a souřadnice pro výpočet slunečních událostí
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="date_format_ddmmyyyy">Datum (DD.MM.RRRR):</label>
+            <input type="text" id="sunEventsDate" class="date-input" placeholder="30.8.2025" inputmode="numeric">
+        </div>
+        <div class="input-row">
+            <div class="input-col">
+                <label class="input-label" data-i18n="latitude">Zeměpisná šířka:</label>
+                <input type="number" id="latitude" class="location-input" placeholder="50.0755" step="0.0001" min="-90" max="90">
+            </div>
+            <div class="input-col">
+                <label class="input-label" data-i18n="longitude">Zeměpisná délka:</label>
+                <input type="text" id="longitude" class="location-input" placeholder="14.4378" step="0.0001" min="-180" max="180" inputmode="numeric">
+            </div>
+        </div>
+        <div class="format-hint" data-i18n="coordinates_hint">
+            Praha: 50.0755, 14.4378 • Brno: 49.1951, 16.6068<br>Časy se zobrazí v místním časovém pásmu (včetně letního času)
+        </div>
+        <button id="sunEventsBtn" class="calculate-btn" data-i18n="calculate_sun_events">Vypočítat sluneční události</button>
+    </div>
+
+    <!-- Planet Positions Calculator -->
+    <!-- Planet Positions Calculator - ukázka optimalizace timezone select -->
+    <div id="planetPositionsCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Back to main menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="planet_positions_title">🪐 Planet positions</h1>
+            <p data-i18n="planet_positions_description">
+                Heliocentric and geocentric planet positions
+            </p>
+        </div>
+
+        <div id="planetDisplay" class="display">
+            <div class="display-text" data-i18n="planet_positions_result_placeholder">
+                Enter date to calculate planet positions
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label" data-i18n="date_format_ddmmyyyy">Date (DD.MM.YYYY):</label>
+            <input type="text" id="planetDate" class="date-input" placeholder="30.8.2025" inputmode="numeric">
+        </div>
+
+        <div class="input-row">
+            <div class="input-col">
+                <label class="input-label" data-i18n="time_hhmm">Time (HH:MM):</label>
+                <input type="time" id="planetTime" class="date-input" value="00:00">
+            </div>
+            <div class="input-col">
+                <label class="input-label" data-i18n="timezone">Time zone:</label>
+                <select id="planetTimezone" class="date-input">
+                    <option value="0" data-i18n="utc_greenwich">UTC (Greenwich time)</option>
+                    <option value="1" selected data-i18n="cet_winter">CET (UTC+1 - winter time)</option>
+                    <option value="2" data-i18n="cest_summer">CEST (UTC+2 - summer time)</option>
+                    <option value="-5" data-i18n="est_eastern">EST (UTC-5 - Eastern US)</option>
+                    <option value="-8" data-i18n="pst_western">PST (UTC-8 - Western US)</option>
+                    <option value="9" data-i18n="jst_japan">JST (UTC+9 - Japan)</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="planetBtn" class="calculate-btn" data-i18n="calculate_planet_positions">Calculate planet positions</button>
+    </div>
+
+    <!-- Eclipses Calculator -->
+    <div id="eclipsesCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Zpět na hlavní menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="eclipses_title">🌑 Zatmění</h1>
+            <p data-i18n="eclipses_description">
+                Sluneční a měsíční zatmění v daném roce
+            </p>
+        </div>
+        <div id="eclipsesDisplay" class="display">
+            <div class="display-text" data-i18n="eclipses_placeholder">
+                Zadejte rok pro výpočet zatmění
+            </div>
+        </div>
+        <div class="input-section">
+            <label class="input-label" data-i18n="year_label">Rok:</label>
+            <input type="number" id="eclipsesYear" class="number-input" placeholder="2025" min="1900" max="2100">
+        </div>
+        <button id="eclipsesBtn" class="calculate-btn" data-i18n="find_eclipses">Najít zatmění</button>
+    </div>
+
+    <!-- Sidereal Time Calculator -->
+    <!-- Sidereal Time Calculator - ukázka optimalizace select options -->
+    <div id="siderealTimeCalculator" class="calculator-view">
+        <div class="back-button" data-back="dayOfWeek" data-i18n="back_to_main">
+            ← Back to main menu
+        </div>
+        <div class="header">
+            <h1 data-i18n="sidereal_time_title">⏰ Sidereal time</h1>
+            <p data-i18n="sidereal_time_description">
+                Calculation of sidereal time for a given place and time
+            </p>
+        </div>
+
+        <div id="siderealDisplay" class="display">
+            <div class="display-text" data-i18n="sidereal_time_result_placeholder">
+                Enter date, time and longitude
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label" data-i18n="date_format_ddmmyyyy">Date (DD.MM.YYYY):</label>
+            <input type="text" id="siderealDate" class="date-input" placeholder="30.8.2025" inputmode="numeric">
+        </div>
+
+        <div class="input-row">
+            <div class="input-col">
+                <label class="input-label" data-i18n="time_hhmm">Time (HH:MM):</label>
+                <input type="time" id="siderealTime" class="date-input">
+            </div>
+            <div class="input-col">
+                <label class="input-label" data-i18n="dst_label">Daylight saving time (DST):</label>
+                <select id="siderealDST" class="date-input">
+                    <option value="0" data-i18n="winter_time">Winter time (standard)</option>
+                    <option value="1" data-i18n="summer_time">Summer time (+1 hour)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label" data-i18n="longitude">Longitude:</label>
+            <input type="text" id="siderealLongitude" class="location-input" placeholder="14.4378" step="0.0001" min="-180" max="180" inputmode="numeric">
+            <div class="format-hint">
+                Prague: 14.4378° • London: -0.1278° • New York: -74.0060°<br>Time zone will be automatically calculated from longitude (15° = 1 hour)
+            </div>
+        </div>
+
+        <button id="siderealBtn" class="calculate-btn" data-i18n="calculate_sidereal_time">Calculate sidereal time</button>
+    </div>
+</div>
+</div>
+<script>
+(function() {
+'use strict';
+var isMenuOpen = false;
+var currentCalculator = 'dayOfWeek';
+var hasLocalStorage = false;
+var activeInput = null;
+
+// PWA specific variables
+var deferredPrompt;
+var isInstalled = false;
+
+// Test localStorage availability
+try {
+if (typeof Storage !== 'undefined' && window.localStorage) {
+localStorage.setItem('test', 'test');
+localStorage.removeItem('test');
+hasLocalStorage = true;
+}
+} catch (e) {
+hasLocalStorage = false;
+}
+
+// PWA Installation functionality
+function initPWA() {
+// Check if app is already installed
+if (window.matchMedia('(display-mode: standalone)').matches) {
+isInstalled = true;
+}
+
+// Listen for install prompt
+window.addEventListener('beforeinstallprompt', function(e) {
+e.preventDefault();
+deferredPrompt = e;
+showInstallPrompt();
+});
+
+// Handle successful installation
+window.addEventListener('appinstalled', function(e) {
+hideInstallPrompt();
+isInstalled = true;
+if (hasLocalStorage) {
+try {
+localStorage.setItem('pwa-installed', 'true');
+} catch(e) {}
+}
+});
+
+// Check if user has previously dismissed install prompt
+var dismissedInstall = false;
+if (hasLocalStorage) {
+try {
+dismissedInstall = localStorage.getItem('pwa-install-dismissed') === 'true';
+} catch(e) {}
+}
+
+// Show install prompt after delay if not installed and not dismissed
+if (!isInstalled && !dismissedInstall) {
+setTimeout(showInstallPrompt, 30000); // Show after 30 seconds
+}
+}
+
+function showInstallPrompt() {
+if (isInstalled || !deferredPrompt) return;
+
+var installPrompt = document.getElementById('installPrompt');
+if (installPrompt) {
+installPrompt.classList.add('show');
+}
+}
+
+function hideInstallPrompt() {
+var installPrompt = document.getElementById('installPrompt');
+if (installPrompt) {
+installPrompt.classList.remove('show');
+}
+}
+
+function handleInstall() {
+if (!deferredPrompt) return;
+
+deferredPrompt.prompt();
+deferredPrompt.userChoice.then(function(choiceResult) {
+if (choiceResult.outcome === 'accepted') {
+console.log('User accepted the install prompt');
+} else {
+console.log('User dismissed the install prompt');
+}
+deferredPrompt = null;
+});
+
+hideInstallPrompt();
+}
+
+function dismissInstall() {
+hideInstallPrompt();
+if (hasLocalStorage) {
+try {
+localStorage.setItem('pwa-install-dismissed', 'true');
+} catch(e) {}
+}
+}
+
+// Connection status monitoring
+// Optimalizovaná funkce updateConnectionStatus
+function updateConnectionStatus() {
+var statusElement = document.getElementById('connectionStatus');
+if (!statusElement) return;
+
+if (navigator.onLine) {
+var onlineText = window.i18nReady && window.i18nReady() ?
+i18n("connection_online"):
+"🌐 Online - background updates active";
+statusElement.textContent = onlineText;
+statusElement.className = 'connection-status online';
+setTimeout(function() {
+statusElement.classList.remove('online');
+}, 3000);
+} else {
+var offlineText = window.i18nReady && window.i18nReady() ?
+i18n("connection_offline"):
+"📱 Offline - everything works from cache";
+statusElement.textContent = offlineText;
+statusElement.className = 'connection-status offline';
+}
+}
+
+
+// Enhanced offline detection
+function setupOfflineHandling() {
+// Check if app is running standalone (installed as PWA)
+var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+window.navigator.standalone ||
+document.referrer.includes('android-app://');
+
+if (isStandalone) {
+// Show persistent offline indicator for installed PWA
+updateConnectionStatus();
+}
+
+// Listen for online/offline events
+window.addEventListener('online', function() {
+updateConnectionStatus();
+console.log('Aplikace je online');
+});
+
+window.addEventListener('offline', function() {
+updateConnectionStatus();
+console.log('Aplikace funguje offline');
+});
+
+// Initial status check
+updateConnectionStatus();
+}
+
+// Theme management
+function getStoredTheme() {
+if (hasLocalStorage) {
+try {
+return localStorage.getItem('selectedTheme') || '';
+} catch (e) {
+return '';
+}
+}
+return '';
+}
+
+function setStoredTheme(theme) {
+if (hasLocalStorage) {
+try {
+localStorage.setItem('selectedTheme', theme);
+} catch (e) {}
+}
+}
+
+// Menu functionality
+// KOMPLETNÍ OPRAVENÁ FUNKCE toggleMenu
+// FINÁLNÍ OPRAVENÁ FUNKCE toggleMenu s debouncing
+function toggleMenu() {
+var dropdown = document.getElementById('menuDropdown');
+var overlay = document.getElementById('menuOverlay');
+if (!dropdown || !overlay) return;
+
+isMenuOpen = !isMenuOpen;
+if (isMenuOpen) {
+dropdown.classList.add('show');
+overlay.classList.add('show');
+dropdown.style.display = 'block';
+document.body.style.overflow = 'hidden';
+} else {
+dropdown.classList.remove('show');
+overlay.classList.remove('show');
+document.body.style.overflow = 'auto';
+setTimeout(function() {
+if (!isMenuOpen) dropdown.style.display = 'none';
+},
+300);
+}
+}
+// KOMPLETNÍ OPRAVENÁ FUNKCE toggleSubmenu
+function toggleSubmenu(submenuId) {
+var submenu = document.getElementById(submenuId);
+if (!submenu) return;
+
+// Zavři ostatní submenu (ale ne hlavní menu!)
+var allSubmenus = document.querySelectorAll('.submenu');
+for (var i = 0; i < allSubmenus.length; i++) {
+if (allSubmenus[i].id !== submenuId) {
+allSubmenus[i].classList.remove('show');
+}
+}
+
+// Toggle aktuální submenu
+if (submenu.classList.contains('show')) {
+submenu.classList.remove('show');
+} else {
+submenu.classList.add('show');
+}
+
+// DŮLEŽITÉ: NEMĚŇ stav hlavního menu!
+// Menu zůstane otevřené pro další navigaci
+}
+// Calculator switching
+// OPRAVA 2: Funkce showCalculator - přidej event handling
+function showCalculator(calculatorType) {
+// Najdi všechny kalkulátory a skryj je
+var calculators = document.querySelectorAll('.calculator-view');
+for (var i = 0; i < calculators.length; i++) {
+calculators[i].classList.remove('active');
+}
+
+// Zobraz správný kalkulátor
+var targetCalculator;
+switch (calculatorType) {
+case 'year-finder':
+targetCalculator = document.getElementById('yearFinderCalculator');
+currentCalculator = 'yearFinder';
+break;
+case 'calendar-converter':
+targetCalculator = document.getElementById('calendarConverterCalculator');
+currentCalculator = 'calendarConverter';
+break;
+case 'easter':
+targetCalculator = document.getElementById('easterCalculator');
+currentCalculator = 'easter';
+break;
+case 'moon-phase':
+targetCalculator = document.getElementById('moonPhaseCalculator');
+currentCalculator = 'moonPhase';
+break;
+case 'date-math':
+targetCalculator = document.getElementById('dateMathCalculator');
+currentCalculator = 'dateMath';
+break;
+case 'sun-events':
+targetCalculator = document.getElementById('sunEventsCalculator');
+currentCalculator = 'sunEvents';
+break;
+case 'planet-positions':
+targetCalculator = document.getElementById('planetPositionsCalculator');
+currentCalculator = 'planetPositions';
+break;
+case 'eclipses':
+targetCalculator = document.getElementById('eclipsesCalculator');
+currentCalculator = 'eclipses';
+break;
+case 'sidereal-time':
+targetCalculator = document.getElementById('siderealTimeCalculator');
+currentCalculator = 'siderealTime';
+break;
+default:
+targetCalculator = document.getElementById('dayOfWeekCalculator');
+currentCalculator = 'dayOfWeek';
+}
+
+if (targetCalculator) {
+targetCalculator.classList.add('active');
+}
+
+// OPRAVENO: Přímo zavři menu, nepouživej toggleMenu()
+var dropdown = document.getElementById('menuDropdown');
+var overlay = document.getElementById('menuOverlay');
+
+if (dropdown && overlay && isMenuOpen) {
+dropdown.classList.remove('show');
+overlay.classList.remove('show');
+document.body.style.overflow = 'auto';
+isMenuOpen = false;
+
+setTimeout(function() {
+if (!isMenuOpen && dropdown) {
+dropdown.style.display = 'none';
+}
+},
+300);
+}
+}
+
+// OPRAVA 1: Funkce changeTheme - odstraň toggleMenu()
+function changeTheme(themeName) {
+document.body.className = themeName;
+setStoredTheme(themeName);
+
+// OPRAVENO: Přímo zavři menu místo toggle
+var dropdown = document.getElementById('menuDropdown');
+var overlay = document.getElementById('menuOverlay');
+
+if (dropdown && overlay) {
+dropdown.classList.remove('show');
+overlay.classList.remove('show');
+document.body.style.overflow = 'auto';
+isMenuOpen = false;
+
+setTimeout(function() {
+if (!isMenuOpen && dropdown) {
+dropdown.style.display = 'none';
+}
+},
+300);
+}
+}
+
+// Display management
+function getCurrentDisplay() {
+switch (currentCalculator) {
+case 'yearFinder': return document.getElementById('yearFinderDisplay');
+case 'calendarConverter': return document.getElementById('converterDisplay');
+case 'easter': return document.getElementById('easterDisplay');
+case 'moonPhase': return document.getElementById('moonDisplay');
+case 'dateMath': return document.getElementById('dateMathDisplay');
+case 'sunEvents': return document.getElementById('sunEventsDisplay');
+case 'planetPositions': return document.getElementById('planetDisplay');
+case 'eclipses': return document.getElementById('eclipsesDisplay');
+case 'siderealTime': return document.getElementById('siderealDisplay');
+default: return document.getElementById('display');
+}
+}
+
+function showLoading() {
+var display = getCurrentDisplay();
+if (display) {
+display.className = 'display';
+display.innerHTML = '<div class="display-text"><span class="loading"></span><span data-i18n="calculating">Počítám...</span></div>';
+}
+}
+
+function showResult(result) {
+var display = getCurrentDisplay();
+if (display) {
+display.className = 'display result';
+display.innerHTML = '<div class="display-text">' + result + '</div>';
+}
+}
+
+function showError(error) {
+var display = getCurrentDisplay();
+if (display) {
+display.className = 'display error';
+display.innerHTML = '<div class="display-text">⚠️ ' + error + '</div>';
+}
+}
+
+// Optimalizovaná funkce clearDisplay
+function clearDisplay() {
+var display = getCurrentDisplay();
+if (display) {
+display.className = 'display';
+var defaultText = currentCalculator === 'dayOfWeek' ?
+i18n('enter_date_calculation'):
+i18n('enter_parameters_calculation');
+display.innerHTML = '<div class="display-text">' + defaultText + '</div>';
+}
+}
+
+// Optimalizovaná funkce showVersion
+function showVersion() {
+var display = getCurrentDisplay();
+if (display) {
+display.className = 'display result';
+var installStatus = isInstalled ?
+'📱 ' + i18n("version_installed_pwa"):
+'🌐 ' + i18n("version_web_version");
+var offlineStatus = navigator.onLine ?
+'🌐 ' + i18n("version_online_connection"):
+'📱 ' + i18n("version_offline_mode_active");
+
+display.innerHTML = '<div class="display-text">📅 <strong>' +
+i18n("version_app_title") + '</strong><br><small>' +
+i18n("version_astronomical_features") + '<br>' +
+installStatus + ' • ' + offlineStatus + '<br>' +
+'✅ ' + i18n("version_offline_functionality") + '</small></div>';
+}
+var dropdown = document.getElementById('menuDropdown');
+if (dropdown) {
+dropdown.classList.remove('show');
+dropdown.style.display = 'none';
+isMenuOpen = false;
+}
+}
+
+function fillDate(dateString) {
+var dateInput = document.getElementById('dateInput');
+if (dateInput) {
+dateInput.value = dateString;
+clearDisplay();
+}
+}
+
+// Date parsing and validation functions - ZACHOVANÉ PŘESNĚ
+function parseDate(dateString) {
+try {
+var cleaned = dateString.trim();
+var parts = cleaned.split(/[.\-\/\s]+/);
+
+if (parts.length === 1 && /^\d+$/.test(cleaned)) {
+var num = cleaned;
+if (num.length === 8) {
+parts = [num.substring(0, 2),
+num.substring(2, 4),
+num.substring(4, 8)];
+} else if (num.length === 6) {
+var year = parseInt(num.substring(4, 6));
+var fullYear = year >= 50 ? 1900 + year: 2000 + year;
+parts = [num.substring(0, 2),
+num.substring(2, 4),
+fullYear.toString()];
+} else if (num.length === 7) {
+if (parseInt(num.substring(1, 3)) <= 12) {
+parts = [num.substring(0, 1),
+num.substring(1, 3),
+num.substring(3, 7)];
+} else {
+parts = [num.substring(0, 2),
+num.substring(2, 3),
+num.substring(3, 7)];
+}
+} else if (num.length === 5) {
+if (parseInt(num.substring(1, 3)) <= 12) {
+var year = parseInt(num.substring(3, 5));
+var fullYear = year >= 50 ? 1900 + year: 2000 + year;
+parts = [num.substring(0, 1),
+num.substring(1, 3),
+fullYear.toString()];
+} else {
+var year = parseInt(num.substring(3, 5));
+var fullYear = year >= 50 ? 1900 + year: 2000 + year;
+parts = [num.substring(0, 2),
+num.substring(2, 3),
+fullYear.toString()];
+}
+} else if (num.length === 4) {
+return {
+day: 1,
+month: 1,
+year: parseInt(num)
+};
+}
+}
+
+if (parts.length !== 3) return null;
+
+var day = parseInt(parts[0]);
+var month = parseInt(parts[1]);
+var year = parseInt(parts[2]);
+
+if (year < 100 && parts[2].length === 2 && (cleaned.indexOf('.') !== -1 || cleaned.indexOf('/') !== -1 || cleaned.indexOf('-') !== -1 || cleaned.indexOf(' ') !== -1)) {
+if (year >= 50) {
+year += 1900;
+} else {
+year += 2000;
+}
+}
+
+if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+return {
+day: day,
+month: month,
+year: year
+};
+} catch (e) {
+return null;
+}
+}
+
+// Optimalizovaná validace
+function validateDate(day, month, year) {
+if (day < 1 || day > 31) return i18n("day_must_be_1_31");
+if (month < 1 || month > 12) return i18n("month_must_be_1_12");
+if (year < 1) return i18n("year_must_be_at_least_1");
+
+var daysInMonth = [31,
+isLeapYear(year) ? 29: 28,
+31,
+30,
+31,
+30,
+31,
+31,
+30,
+31,
+30,
+31];
+if (day > daysInMonth[month - 1]) {
+var monthName = getMonthName(month);
+return monthName + " má pouze " + daysInMonth[month - 1] + " dní";
+}
+return null;
+}
+
+function isLeapYear(year) {
+if (year < 1582) {
+return year % 4 === 0;
+} else {
+return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+}
+}
+
+function openLink(url) {
+try {
+if (window.open) {
+window.open(url, '_blank');
+} else {
+window.location.href = url;
+}
+} catch (error) {
+try {
+window.location.href = url;
+} catch (e) {}
+}
+toggleMenu();
+}
+
+// VŠECHNY ALGORITMY ZACHOVANÉ PŘESNĚ BEZ ZMĚN
+
+// Day of week calculation (Zeller's congruence)
+// Optimalizovaná funkce getDayOfWeek - použití getWeekdayName
+function getDayOfWeek(d, m, r) {
+try {
+if (r === 1582 && m === 10 && d >= 5 && d <= 14) {
+return i18n("result_date_nonexistent", {
+date: d + '.' + m + '.' + r
+}) +
+'<br><small>' + i18n("result_calendar_transition") + '</small>';
+}
+
+var cal,
+h;
+
+if (r < 1582 || (r === 1582 && m < 10) || (r === 1582 && m === 10 && d <= 4)) {
+cal = i18n("calendar_julian");
+var me,
+rr;
+if (m < 3) {
+me = m + 12;
+rr = r - 1;
+} else {
+me = m;
+rr = r;
+}
+h = ((d + Math.floor((13 * (me + 1)) / 5) + rr + Math.floor(rr / 4) - 1) % 7 + 7) % 7;
+
+// Použití optimalizované funkce getWeekdayName
+var weekdayName = getWeekdayName((h + 5) % 7); // Převod z julián indexu
+var leapIndicator = isLeapYear(r) ? ' • ' + i18n("leap_year"): '';
+return i18n("result_date_weekday", {
+date: d + '.' + m + '.' + r, weekday: weekdayName
+}) +
+'<br><small>' + cal + leapIndicator + '</small>';
+} else {
+cal = i18n("calendar_gregorian");
+var me,
+rr;
+if (m < 3) {
+me = m + 12;
+rr = r - 1;
+} else {
+me = m;
+rr = r;
+}
+var k = rr % 100;
+var j = Math.floor(rr / 100);
+h = ((d + Math.floor((13 * (me + 1)) / 5) + k + Math.floor(k / 4) + Math.floor(j / 4) - (2 * j)) % 7 + 7) % 7;
+
+// Použití optimalizované funkce getWeekdayName
+var weekdayName = getWeekdayName(h); // Gregoriánský index
+var leapIndicator = isLeapYear(r) ? ' • ' + i18n("leap_year"): '';
+return i18n("result_date_weekday", {
+date: d + '.' + m + '.' + r, weekday: weekdayName
+}) +
+'<br><small>' + cal + leapIndicator + '</small>';
+}
+} catch (e) {
+return i18n("error_calculation");
+}
+}
+
+// Optimalizovaná funkce getDayOfWeekSimple
+function getDayOfWeekSimple(d, m, r) {
+var me = m,
+rr = r;
+if (m < 3) {
+me = m + 12;
+rr = r - 1;
+}
+
+if (r < 1582 || (r === 1582 && m < 10) || (r === 1582 && m === 10 && d <= 4)) {
+var h = ((d + Math.floor((13 * (me + 1)) / 5) + rr + Math.floor(rr / 4) - 1) % 7 + 7) % 7;
+return getWeekdayName((h + 5) % 7, false); // lowercase = true
+} else {
+var k = rr % 100;
+var j = Math.floor(rr / 100);
+var h = ((d + Math.floor((13 * (me + 1)) / 5) + k + Math.floor(k / 4) + Math.floor(j / 4) - (2 * j)) % 7 + 7) % 7;
+return getWeekdayName(h, false); // lowercase = true
+}
+}
+
+// Julian day number calculations
+function getJulianDayNumber(day, month, year, isJulian) {
+if (isJulian === undefined) isJulian = false;
+
+var a = Math.floor((14 - month) / 12);
+var y = year + 4800 - a;
+var m = month + 12 * a - 3;
+
+var jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4);
+
+if (!isJulian) {
+jdn = jdn - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+} else {
+jdn = jdn - 32083;
+}
+
+return jdn;
+}
+
+function getDateFromJulianDay(jdn, isJulian) {
+if (isJulian === undefined) isJulian = false;
+
+var a,
+b,
+c,
+d,
+e;
+
+if (!isJulian) {
+a = jdn + 32044;
+b = Math.floor((4 * a + 3) / 146097);
+c = a - Math.floor((146097 * b) / 4);
+d = Math.floor((4 * c + 3) / 1461);
+e = c - Math.floor((1461 * d) / 4);
+} else {
+a = jdn + 32082;
+d = Math.floor((4 * a + 3) / 1461);
+e = a - Math.floor((1461 * d) / 4);
+}
+
+var m = Math.floor((5 * e + 2) / 153);
+var day = e - Math.floor((153 * m + 2) / 5) + 1;
+var month = m + 3 - 12 * Math.floor(m / 10);
+var year = (!isJulian ? 100 * b: 0) + d - 4800 + Math.floor(m / 10);
+
+return {
+day: day,
+month: month,
+year: year
+};
+}
+
+// Date arithmetic
+function addDays(date, days) {
+var newDate = new Date(date.year, date.month - 1, date.day);
+newDate.setDate(newDate.getDate() + days);
+return {
+day: newDate.getDate(),
+month: newDate.getMonth() + 1,
+year: newDate.getFullYear()
+};
+}
+
+function formatDate(date) {
+return date.day + '.' + date.month + '.' + date.year;
+}
+
+// Easter calculation
+function getEasterDate(year) {
+var a = year % 19;
+var b = Math.floor(year / 100);
+var c = year % 100;
+var d = Math.floor(b / 4);
+var e = b % 4;
+var f = Math.floor((b + 8) / 25);
+var g = Math.floor((b - f + 1) / 3);
+var h = (19 * a + b - d - g + 15) % 30;
+var i = Math.floor(c / 4);
+var k = c % 4;
+var l = (32 + 2 * e + 2 * i - h - k) % 7;
+var m = Math.floor((a + 11 * h + 22 * l) / 451);
+var month = Math.floor((h + l - 7 * m + 114) / 31);
+var day = ((h + l - 7 * m + 114) % 31) + 1;
+
+return {
+day: day,
+month: month,
+year: year
+};
+}
+
+// Enhanced Moon phase calculations
+function getMoonAge(day, month, year) {
+var jd = getJulianDayNumber(day, month, year);
+var newMoonJD = 2451549.5; // JD nového měsíce 6.1.2000
+var synodicMonth = 29.53058867; // synodický měsíc ve dnech
+
+var daysSinceNewMoon = (jd - newMoonJD) % synodicMonth;
+if (daysSinceNewMoon < 0) daysSinceNewMoon += synodicMonth;
+
+return daysSinceNewMoon;
+}
+
+// Optimalizovaná funkce getMoonPhase
+function getMoonPhase(age) {
+if (age < 1.84566) return i18n("moon_new");
+else if (age < 5.53699) return i18n("moon_waxing_crescent");
+else if (age < 9.22831) return i18n("moon_first_quarter");
+else if (age < 12.91963) return i18n("moon_waxing_gibbous");
+else if (age < 16.61096) return i18n("moon_full");
+else if (age < 20.30228) return i18n("moon_waning_gibbous");
+else if (age < 23.99361) return i18n("moon_last_quarter");
+else if (age < 27.68493) return i18n("moon_waning_crescent");
+else return i18n("moon_new");
+}
+
+
+function getMoonEmoji(age) {
+if (age < 1.84566) return "🌑";
+else if (age < 5.53699) return "🌒";
+else if (age < 9.22831) return "🌓";
+else if (age < 12.91963) return "🌔";
+else if (age < 16.61096) return "🌕";
+else if (age < 20.30228) return "🌖";
+else if (age < 23.99361) return "🌗";
+else if (age < 27.68493) return "🌘";
+else return "🌑";
+}
+
+// Corrected sun events calculations using NOAA algorithm with proper timezone handling
+function calculateSunEvents(day, month, year, latitude, longitude) {
+try {
+var jd = getJulianDayNumber(day, month, year);
+var T = (jd - 2451545.0) / 36525.0; // Centuries since J2000
+
+// Check for polar regions
+if (Math.abs(latitude) > 66.5) {
+return handlePolarRegions(day, month, year, latitude, longitude);
+}
+
+// Solar mean longitude (degrees)
+var L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+if (L0 < 0) L0 += 360;
+
+// Solar mean anomaly (degrees)
+var M = (357.52911 + T * (35999.05029 - T * 0.0001537)) % 360;
+var M_rad = M * Math.PI / 180;
+
+// Earth's eccentricity
+var e = 0.016708634 - T * (0.000042037 + T * 0.0000001267);
+
+// Sun's equation of center (degrees)
+var C = Math.sin(M_rad) * (1.914602 - T * (0.004817 + T * 0.000014)) +
+Math.sin(2 * M_rad) * (0.019993 - T * 0.000101) +
+Math.sin(3 * M_rad) * 0.000289;
+
+// True longitude (degrees)
+var trueLon = L0 + C;
+
+// Apparent longitude - nutation correction (degrees)
+var omega = (125.04 - 1934.136 * T) * Math.PI / 180;
+var apparentLon = trueLon - 0.00569 - 0.00478 * Math.sin(omega);
+
+// Obliquity of ecliptic (degrees)
+var epsilon0 = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+var epsilon = epsilon0 + 0.00256 * Math.cos(omega);
+var epsilon_rad = epsilon * Math.PI / 180;
+var apparentLon_rad = apparentLon * Math.PI / 180;
+
+// Solar declination (radians)
+var declination = Math.asin(Math.sin(epsilon_rad) * Math.sin(apparentLon_rad));
+
+// Equation of time (minutes)
+var y = Math.pow(Math.tan(epsilon_rad / 2), 2);
+var L0_rad = L0 * Math.PI / 180;
+var eqTime = 4 * (180 / Math.PI) * (
+y * Math.sin(2 * L0_rad) -
+2 * e * Math.sin(M_rad) +
+4 * e * y * Math.sin(M_rad) * Math.cos(2 * L0_rad) -
+0.5 * y * y * Math.sin(4 * L0_rad) -
+1.25 * e * e * Math.sin(2 * M_rad)
+);
+
+// Hour angle for sunrise/sunset (including atmospheric refraction)
+var latRad = latitude * Math.PI / 180;
+var zenith = 90.833; // 90° + 50' atmospheric refraction + 16' solar radius
+var cosHA = (Math.cos(zenith * Math.PI / 180) - Math.sin(latRad) * Math.sin(declination)) /
+(Math.cos(latRad) * Math.cos(declination));
+
+// Check for polar day/night
+if (cosHA > 1) {
+return {
+sunrise: i18n("sun_never_rises"),
+sunset: i18n("sun_never_rises"),
+dayLength: "0:00",
+declination: (declination * 180 / Math.PI).toFixed(2) + '°',
+polarNight: true
+};
+}
+if (cosHA < -1) {
+return {
+sunrise: i18n("sun_never_sets"),
+sunset: i18n("sun_never_sets"),
+dayLength: "24:00",
+declination: (declination * 180 / Math.PI).toFixed(2) + '°',
+polarDay: true
+};
+}
+
+var HA = Math.acos(cosHA) * 180 / Math.PI; // Hour angle in degrees
+
+// Get timezone for the location
+var timezone = determineTimezone(longitude, month);
+
+// Calculate times in solar time first
+var solarNoon = 12 - eqTime / 60; // Solar noon in solar time
+var sunriseUTC = solarNoon - HA / 15 - longitude / 15; // UTC time
+var sunsetUTC = solarNoon + HA / 15 - longitude / 15; // UTC time
+
+// Convert UTC to local time
+var sunrise = sunriseUTC + timezone;
+var sunset = sunsetUTC + timezone;
+
+// Ensure times are in 0-24 range
+while (sunrise < 0) sunrise += 24;
+while (sunrise >= 24) sunrise -= 24;
+while (sunset < 0) sunset += 24;
+while (sunset >= 24) sunset -= 24;
+
+// Calculate day length
+var dayLengthHours = HA * 2 / 15; // Hours of daylight
+var dayLengthHour = Math.floor(dayLengthHours);
+var dayLengthMin = Math.round((dayLengthHours - dayLengthHour) * 60);
+
+return {
+sunrise: formatTime(sunrise),
+sunset: formatTime(sunset),
+dayLength: formatHoursMinutes(dayLengthHour, dayLengthMin),
+declination: (declination * 180 / Math.PI).toFixed(2) + '°',
+eqTime: eqTime.toFixed(1) + ' min',
+timezone: 'UTC' + (timezone >= 0 ? '+': '') + timezone
+};
+
+} catch (error) {
+return {
+sunrise: i18n("calculation_error_short"),
+sunset: i18n("calculation_error_short"),
+dayLength: "---",
+declination: "---"
+};
+}
+
+}
+
+function determineTimezone(longitude, month) {
+// Basic timezone from longitude (15° = 1 hour)
+var basicTZ = Math.round(longitude / 15);
+
+// DST logic for European rules
+var isDST = false;
+
+// European DST: last Sunday in March to last Sunday in October
+if (month > 3 && month < 10) {
+// Definitely DST (April to September)
+isDST = true;
+} else if (month === 3) {
+// March - DST starts around March 25-31 (simplified)
+isDST = true; // Could be refined to check actual date
+} else if (month === 10) {
+// October - DST ends around October 25-31 (simplified)
+isDST = false; // Could be refined to check actual date
+}
+// For months 1,2,11,12 (Jan,Feb,Nov,Dec) isDST remains false
+
+// Timezone corrections for specific regions
+if (longitude >= -10 && longitude <= 40) {
+// Europe roughly
+if (longitude >= -10 && longitude <= 5) {
+// Western Europe (UK, Portugal, western France)
+return isDST ? 1: 0; // GMT/BST
+} else if (longitude >= 5 && longitude <= 15) {
+// Central Europe (CET/CEST)
+return isDST ? 2: 1; // CET/CEST
+} else if (longitude >= 15 && longitude <= 30) {
+// Eastern Europe (EET/EEST)
+return isDST ? 3: 2; // EET/EEST
+} else {
+// Further east
+return isDST ? 4: 3;
+}
+}
+
+// For other regions outside Europe, use basic calculation
+return basicTZ + (isDST ? 1: 0);
+}
+
+function handlePolarRegions(day, month, year, latitude, longitude) {
+// Simplified polar region handling
+var jd = getJulianDayNumber(day, month, year);
+var T = (jd - 2451545.0) / 36525.0;
+var L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360;
+var M = (357.52911 + T * (35999.05029 - T * 0.0001537)) % 360;
+var C = Math.sin(M * Math.PI / 180) * 1.914602;
+var trueLon = L0 + C;
+var epsilon = 23.4393 - 0.0130 * T;
+var declination = Math.asin(Math.sin(epsilon * Math.PI / 180) * Math.sin(trueLon * Math.PI / 180));
+
+// Determine if it's polar day or night
+var isPolarDay = (latitude > 0 && declination > (90 - latitude) * Math.PI / 180) ||
+(latitude < 0 && declination < (90 + latitude) * Math.PI / 180);
+var isPolarNight = (latitude > 0 && declination < -(90 - latitude) * Math.PI / 180) ||
+(latitude < 0 && declination > -(90 + latitude) * Math.PI / 180);
+
+if (isPolarDay) {
+return {
+sunrise: i18n("sun_never_sets"),
+sunset: i18n("sun_never_sets"),
+dayLength: "24:00",
+declination: (declination * 180 / Math.PI).toFixed(2) + '°',
+polarDay: true
+};
+} else if (isPolarNight) {
+return {
+sunrise: i18n("sun_never_rises"),
+sunset: i18n("sun_never_rises"),
+dayLength: "0:00",
+declination: (declination * 180 / Math.PI).toFixed(2) + '°',
+polarNight: true
+};
+} else {
+// Use standard calculation for border cases
+return calculateSunEvents(day, month, year, latitude, longitude);
+}
+}
+
+
+function formatTime(hours) {
+var h = Math.floor(hours);
+var mFloat = (hours - h) * 60;
+var m = Math.floor(mFloat);
+var s = Math.round((mFloat - m) * 60);
+
+// Korekce přetečení sekund
+if (s === 60) {
+s = 0;
+m++;
+}
+if (m === 60) {
+m = 0;
+h++;
+}
+if (h >= 24) h -= 24;
+if (h < 0) h += 24;
+
+return (h < 10 ? '0': '') + h + ':' +
+(m < 10 ? '0': '') + m + ':' +
+(s < 10 ? '0': '') + s;
+}
+
+function formatHoursMinutes(hours, minutes) {
+if (minutes >= 60) {
+hours++; minutes -= 60;
+}
+return (hours < 10 ? '0': '') + hours + ':' + (minutes < 10 ? '0': '') + minutes;
+}
+
+// Geocentric planet positions as seen from Earth
+function getPlanetPositions(day, month, year, hour, minute, timezone) {
+// Default values if time not provided
+if (hour === undefined) hour = 0;
+if (minute === undefined) minute = 0;
+if (timezone === undefined) timezone = 0;
+
+// Convert to Julian Day with time
+var jd = getJulianDayNumber(day, month, year);
+
+// Add time component (convert local time to UTC)
+var timeOffset = (hour - timezone + minute / 60.0) / 24.0;
+jd += timeOffset;
+
+var T = (jd - 2451545.0) / 36525; // Centuries since J2000
+
+// Calculate Earth's position first
+var earthLongitude = getEarthPosition(T);
+
+var planets = [];
+
+// Inner planets (Mercury, Venus) - lokalizované názvy
+var mercury = calculateInnerPlanet(i18n("planet_mercury"), T, 252.25, 149472.67, 0.387, 0.206, earthLongitude);
+planets.push(mercury);
+
+var venus = calculateInnerPlanet(i18n("planet_venus"), T, 181.98, 58517.82, 0.723, 0.007, earthLongitude);
+planets.push(venus);
+
+// Outer planets (Mars, Jupiter, Saturn) - lokalizované názvy
+var mars = calculateOuterPlanet(i18n("planet_mars"), T, 355.43, 19140.30, 1.524, 0.093, earthLongitude);
+planets.push(mars);
+
+var jupiter = calculateOuterPlanet(i18n("planet_jupiter"), T, 34.35, 3034.74, 5.203, 0.048, earthLongitude);
+planets.push(jupiter);
+
+var saturn = calculateOuterPlanet(i18n("planet_saturn"), T, 50.08, 1222.11, 9.537, 0.054, earthLongitude);
+planets.push(saturn);
+
+return planets;
+}
+
+
+function getEarthPosition(T) {
+// Earth's mean longitude
+var L = (100.464 + 35999.372 * T) % 360;
+if (L < 0) L += 360;
+
+// Earth's mean anomaly
+var M = (357.528 + 35999.050 * T) % 360;
+var M_rad = M * Math.PI / 180;
+
+// Equation of center
+var C = 1.915 * Math.sin(M_rad) + 0.020 * Math.sin(2 * M_rad);
+
+// True longitude
+var trueLongitude = (L + C) % 360;
+if (trueLongitude < 0) trueLongitude += 360;
+
+return trueLongitude;
+}
+
+function calculateInnerPlanet(name, T, L0, n, a, e, earthLong) {
+// More accurate planetary calculations
+var planetConstants = getPlanetConstants(name);
+
+// Mean longitude with higher precision
+var L = (planetConstants.L0 + planetConstants.n * T + planetConstants.n2 * T * T) % 360;
+if (L < 0) L += 360;
+
+// Mean anomaly
+var M = (planetConstants.M0 + planetConstants.M1 * T) % 360;
+var M_rad = M * Math.PI / 180;
+
+// Equation of center (simplified)
+var C = planetConstants.e * Math.sin(M_rad) * (180 / Math.PI);
+
+// True longitude
+var trueLong = (L + C) % 360;
+if (trueLong < 0) trueLong += 360;
+
+// Calculate elongation from Sun (as seen from Earth)
+var elongation = Math.abs(trueLong - earthLong);
+if (elongation > 180) elongation = 360 - elongation;
+
+// More accurate geocentric position
+var geocentricLong = calculateGeocentricPosition(trueLong, earthLong, a, true);
+
+var visibility = getAdvancedVisibility(name, elongation, trueLong, earthLong);
+var constellation = getConstellation(geocentricLong);
+var magnitude = calculateMagnitude(name, elongation, a);
+
+return {
+name: name,
+position: geocentricLong.toFixed(1) + "° (" + i18n("geocentric_longitude") + ")",
+elongation: elongation.toFixed(1) + "° " + i18n("from_sun"),
+visibility: visibility,
+constellation: constellation,
+magnitude: magnitude,
+type: i18n("inner_planet")
+};
+}
+function getPlanetConstants(name) {
+// Převést lokalizovaný název na anglický klíč
+var planetKey = getPlanetKey(name);
+
+var constants = {
+"mercury": {
+L0: 252.25084,
+n: 149472.67486,
+n2: -0.00000536,
+M0: 174.79252,
+M1: 149472.51529,
+e: 0.20563175
+},
+"venus": {
+L0: 181.97973,
+n: 58517.81539,
+n2: 0.00000165,
+M0: 50.44675,
+M1: 58517.81538,
+e: 0.00677192
+}
+};
+return constants[planetKey] || constants["mercury"];
+}
+
+function getOuterPlanetConstants(name) {
+var planetKey = getPlanetKey(name);
+
+var constants = {
+"mars": {
+L0: 355.43299,
+n: 19140.29934,
+n2: 0.00000261,
+M0: 319.51913,
+M1: 19139.85475,
+e: 0.09341233
+},
+"jupiter": {
+L0: 34.35148,
+n: 3034.74612,
+n2: -0.00008501,
+M0: 225.32833,
+M1: 3034.69202,
+e: 0.04849485
+},
+"saturn": {
+L0: 50.07571,
+n: 1222.11494,
+n2: 0.00025899,
+M0: 175.46622,
+M1: 1221.55147,
+e: 0.05554814
+}
+};
+return constants[planetKey] || constants["mars"];
+}
+
+
+// Definice funkce getPlanetKey
+function getPlanetKey(localizedName) {
+// Mapování lokalizovaných názvů na anglické klíče
+var planetMap = {};
+
+// Bezpečná kontrola i18n připravenosti
+if (window.i18nReady) {
+planetMap[i18n("planet_mercury")] = "mercury";
+planetMap[i18n("planet_venus")] = "venus";
+planetMap[i18n("planet_mars")] = "mars";
+planetMap[i18n("planet_jupiter")] = "jupiter";
+planetMap[i18n("planet_saturn")] = "saturn";
+} else {
+// Fallback názvy když i18n není připravený
+planetMap["Merkur"] = "mercury";
+planetMap["Venuše"] = "venus";
+planetMap["Mars"] = "mars";
+planetMap["Jupiter"] = "jupiter";
+planetMap["Saturn"] = "saturn";
+}
+
+return planetMap[localizedName] || "mercury";
+
+}
+
+
+
+function calculateGeocentricPosition(planetLong, earthLong, planetDist, isInner) {
+// Simplified geometric calculation
+if (isInner) {
+// For inner planets, account for viewing angle from Earth
+var phase = (planetLong - earthLong + 360) % 360;
+return phase;
+} else {
+// For outer planets, direct geocentric longitude
+return planetLong;
+}
+}
+
+function getAdvancedVisibility(name, elongation, planetLong, earthLong) {
+if (name === "Merkur" || name === "Venuše") {
+if (elongation < 10) return i18n("planet_invisible_too_close");
+if (elongation > 15 && elongation < 30) {
+var phase = (planetLong - earthLong + 360) % 360;
+if (phase > 180) return i18n("planet_morning_visibility");
+else return i18n("planet_evening_visibility");
+}
+if (elongation >= 30) return i18n("planet_maximum_visibility");
+return i18n("planet_poorly_visible");
+} else {
+// Outer planets
+if (elongation < 30) return i18n("planet_opposition_ideal");
+if (elongation < 90) return i18n("planet_visible_all_night");
+if (elongation < 150) return i18n("planet_visible_evening_morning");
+return i18n("planet_close_to_sun");
+}
+}
+
+
+function calculateMagnitude(name, elongation, distance) {
+// More accurate magnitude calculation
+var baseMag = {};
+
+// Lokalizované názvy planet pomocí getPlanetKey
+var planetKey = getPlanetKey(name);
+var baseMagValues = {
+"mercury": -0.4,
+"venus": -4.0,
+"mars": -2.0,
+"jupiter": -2.5,
+"saturn": 0.0
+};
+
+var mag = baseMagValues[planetKey];
+if (mag === undefined) mag = 5.0; // fallback for unknown planets
+
+// Adjust for distance and phase (simplified)
+if (distance && !isNaN(distance)) {
+mag += Math.log10(distance) * 2.5; // distance modulus approximation
+}
+
+// Phase effect (opposition effect for outer planets)
+if (elongation < 30) {
+mag -= 0.3; // Opposition surge
+} else if (elongation > 150) {
+mag += 0.5; // Worse visibility when close to Sun
+}
+
+return mag.toFixed(1) + " mag";
+}
+
+
+function calculateOuterPlanet(name, T, L0, n, a, e, earthLong) {
+// More accurate planetary calculations
+var planetConstants = getOuterPlanetConstants(name);
+
+// Mean longitude with higher precision
+var L = (planetConstants.L0 + planetConstants.n * T + planetConstants.n2 * T * T) % 360;
+if (L < 0) L += 360;
+
+// Mean anomaly
+var M = (planetConstants.M0 + planetConstants.M1 * T) % 360;
+var M_rad = M * Math.PI / 180;
+
+// Equation of center (simplified)
+var C = planetConstants.e * Math.sin(M_rad) * (180 / Math.PI);
+
+// True longitude
+var trueLong = (L + C) % 360;
+if (trueLong < 0) trueLong += 360;
+
+// Calculate elongation from Sun (as seen from Earth)
+var elongation = Math.abs(trueLong - earthLong);
+if (elongation > 180) elongation = 360 - elongation;
+
+// Geocentric position (for outer planets, approximately same as heliocentric)
+var geocentricLong = trueLong;
+
+var visibility = getAdvancedVisibility(name, elongation, trueLong, earthLong);
+var constellation = getConstellation(geocentricLong);
+var magnitude = calculateMagnitude(name, elongation, a);
+
+return {
+name: name,
+position: geocentricLong.toFixed(1) + "° (" + i18n("geocentric_longitude") + ")",
+elongation: elongation.toFixed(1) + "° " + i18n("from_sun"),
+visibility: visibility,
+constellation: constellation,
+magnitude: magnitude,
+type: i18n("outer_planet")
+};
+}
+
+// Optimalizovaná funkce getConstellations
+function getConstellation(longitude) {
+var constellations = [{
+start: 0,
+end: 30,
+name: i18n("constellation_aries")},
+{
+start: 30,
+end: 60,
+name: i18n("constellation_taurus")},
+{
+start: 60,
+end: 90,
+name: i18n("constellation_gemini")},
+{
+start: 90,
+end: 120,
+name: i18n("constellation_cancer")},
+{
+start: 120,
+end: 150,
+name: i18n("constellation_leo")},
+{
+start: 150,
+end: 180,
+name: i18n("constellation_virgo")},
+{
+start: 180,
+end: 210,
+name: i18n("constellation_libra")},
+{
+start: 210,
+end: 240,
+name: i18n("constellation_scorpio")},
+{
+start: 240,
+end: 270,
+name: i18n("constellation_sagittarius")},
+{
+start: 270,
+end: 300,
+name: i18n("constellation_capricorn")},
+{
+start: 300,
+end: 330,
+name: i18n("constellation_aquarius")},
+{
+start: 330,
+end: 360,
+name: i18n("constellation_pisces")}];
+
+for (var i = 0; i < constellations.length; i++) {
+if (longitude >= constellations[i].start && longitude < constellations[i].end) {
+return constellations[i].name;
+}
+}
+return i18n("constellation_pisces");
+}
+
+// Corrected eclipse calculations using real astronomical data
+function getEclipses(year) {
+var eclipses = [];
+
+// Database of real eclipse data for accurate years (2020-2030)
+var knownEclipses = {
+2020: [{
+type: i18n("eclipse_lunar"),
+date: "10.1.2020",
+visibility: i18n("eclipse_visible_europe_africa_asia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "21.6.2020",
+visibility: i18n("eclipse_annular_africa_asia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "5.7.2020",
+visibility: i18n("eclipse_penumbral_america_sw_europe")
+},
+{
+type: i18n("eclipse_solar"),
+date: "14.12.2020",
+visibility: i18n("eclipse_total_chile_argentina")
+}],
+2021: [{
+type: i18n("eclipse_solar"),
+date: "10.6.2021",
+visibility: i18n("eclipse_annular_northern_regions")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "26.5.2021",
+visibility: i18n("eclipse_total_pacific_america_asia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "19.11.2021",
+visibility: i18n("eclipse_partial_america_ne_asia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "4.12.2021",
+visibility: i18n("eclipse_total_antarctica")
+}],
+2022: [{
+type: i18n("eclipse_solar"),
+date: "30.4.2022",
+visibility: i18n("eclipse_partial_se_pacific")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "16.5.2022",
+visibility: i18n("eclipse_total_america_europe_africa")
+},
+{
+type: i18n("eclipse_solar"),
+date: "25.10.2022",
+visibility: i18n("eclipse_partial_europe_ne_africa_asia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "8.11.2022",
+visibility: i18n("eclipse_total_asia_australia_pacific_america")
+}],
+2023: [{
+type: i18n("eclipse_solar"),
+date: "20.4.2023",
+visibility: i18n("eclipse_hybrid_se_asia_australia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "5.5.2023",
+visibility: i18n("eclipse_penumbral_africa_asia_australia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "14.10.2023",
+visibility: i18n("eclipse_annular_america")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "28.10.2023",
+visibility: i18n("eclipse_partial_europe_asia_australia_africa")
+}],
+2024: [{
+type: i18n("eclipse_lunar"),
+date: "25.3.2024",
+visibility: i18n("eclipse_penumbral_america")
+},
+{
+type: i18n("eclipse_solar"),
+date: "8.4.2024",
+visibility: i18n("eclipse_total_north_america")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "18.9.2024",
+visibility: i18n("eclipse_partial_america_europe_africa")
+},
+{
+type: i18n("eclipse_solar"),
+date: "2.10.2024",
+visibility: i18n("eclipse_annular_pacific_south_america")
+}],
+2025: [{
+type: i18n("eclipse_lunar"),
+date: "14.3.2025",
+visibility: i18n("eclipse_total_america_west_europe")
+},
+{
+type: i18n("eclipse_solar"),
+date: "29.3.2025",
+visibility: i18n("eclipse_partial_europe_nw_africa_arctic")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "7.9.2025",
+visibility: i18n("eclipse_total_europe_africa_asia_australia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "21.9.2025",
+visibility: i18n("eclipse_partial_pacific_antarctica")
+}],
+2026: [{
+type: i18n("eclipse_solar"),
+date: "17.2.2026",
+visibility: i18n("eclipse_annular_antarctica_southern")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "3.3.2026",
+visibility: i18n("eclipse_total_east_asia_australia_pacific_america")
+},
+{
+type: i18n("eclipse_solar"),
+date: "12.8.2026",
+visibility: i18n("eclipse_total_greenland_iceland_spain_russia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "28.8.2026",
+visibility: i18n("eclipse_partial_east_pacific_america_west_africa")
+}],
+2027: [{
+type: i18n("eclipse_solar"),
+date: "6.2.2027",
+visibility: i18n("eclipse_annular_south_pacific_chile_argentina")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "21.2.2027",
+visibility: i18n("eclipse_penumbral_america_europe_africa_asia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "2.8.2027",
+visibility: i18n("eclipse_total_atlantic_spain_africa_asia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "17.8.2027",
+visibility: i18n("eclipse_penumbral_asia_australia_pacific")
+}],
+2028: [{
+type: i18n("eclipse_solar"),
+date: "26.1.2028",
+visibility: i18n("eclipse_annular_ecuador_brazil_spain_portugal")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "12.7.2028",
+visibility: i18n("eclipse_partial_europe_africa_west_asia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "22.7.2028",
+visibility: i18n("eclipse_total_indian_ocean_australia_nz")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "6.1.2029",
+visibility: i18n("eclipse_total_east_pacific_america_west_europe")
+}],
+2029: [{
+type: i18n("eclipse_lunar"),
+date: "6.1.2029",
+visibility: i18n("eclipse_total_america_europe")
+},
+{
+type: i18n("eclipse_solar"),
+date: "14.6.2029",
+visibility: i18n("eclipse_partial_arctic")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "31.12.2029",
+visibility: i18n("eclipse_total_europe_africa_asia_australia")
+}],
+2030: [{
+type: i18n("eclipse_solar"),
+date: "1.6.2030",
+visibility: i18n("eclipse_annular_algeria_tunisia_greece_turkey_russia")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "15.6.2030",
+visibility: i18n("eclipse_partial_europe_africa_asia_australia")
+},
+{
+type: i18n("eclipse_solar"),
+date: "25.11.2030",
+visibility: i18n("eclipse_partial_south_africa_antarctica")
+},
+{
+type: i18n("eclipse_lunar"),
+date: "9.12.2030",
+visibility: i18n("eclipse_penumbral_europe_asia_australia_pacific")
+}]
+};
+
+// If we have exact data, use it
+if (knownEclipses[year]) {
+return knownEclipses[year];
+}
+
+// For other years, use simplified Saros cycle approximation
+return calculateEclipsesUsingSaros(year);
+}
+
+
+function calculateEclipsesUsingSaros(year) {
+var eclipses = [];
+
+// Reference eclipses from known Saros series
+var sarosReferences = [
+// Saros 136 - major solar eclipse series
+{
+type: i18n("eclipse_solar"),
+referenceYear: 2017,
+referenceMonth: 8,
+referenceDay: 21,
+sarosNumber: 136,
+nextYears: [2035,
+2053,
+2071]
+},
+
+// Saros 142 - active solar series
+{
+type: i18n("eclipse_solar"),
+referenceYear: 2023,
+referenceMonth: 4,
+referenceDay: 20,
+sarosNumber: 142,
+nextYears: [2041,
+2059,
+2077]
+},
+
+// Saros 131 - lunar eclipse series
+{
+type: i18n("eclipse_lunar"),
+referenceYear: 2018,
+referenceMonth: 1,
+referenceDay: 31,
+sarosNumber: 131,
+nextYears: [2036,
+2054,
+2072]
+},
+
+// Saros 134 - lunar eclipse series
+{
+type: i18n("eclipse_lunar"),
+referenceYear: 2021,
+referenceMonth: 5,
+referenceDay: 26,
+sarosNumber: 134,
+nextYears: [2039,
+2057,
+2075]
+}];
+
+var sarosPeriod = 18.031; // Saros cycle in years (more precise than 18)
+var currentYear = new Date().getFullYear();
+
+for (var i = 0; i < sarosReferences.length; i++) {
+var ref = sarosReferences[i];
+var yearsSinceReference = year - ref.referenceYear;
+
+// Check if this year should have an eclipse from this Saros series
+var cyclesFromReference = yearsSinceReference / sarosPeriod;
+var isCloseToSarosCycle = Math.abs(cyclesFromReference - Math.round(cyclesFromReference)) < 0.1;
+
+if (isCloseToSarosCycle && Math.abs(yearsSinceReference) <= 200) {
+// Calculate approximate date using Saros shift
+var monthShift = Math.round(cyclesFromReference * 0.37); // Small monthly shift over time
+var dayShift = Math.round(cyclesFromReference * 11 * 0.33); // ~11 days per Saros
+
+var newMonth = ref.referenceMonth + monthShift;
+var newDay = ref.referenceDay + dayShift;
+
+// Normalize month and day
+while (newMonth > 12) {
+newMonth -= 12;
+}
+while (newMonth < 1) {
+newMonth += 12;
+}
+while (newDay > 31) {
+newDay -= 30;
+}
+while (newDay < 1) {
+newDay += 30;
+}
+
+// Determine visibility based on geographical shift
+var longitude = (cyclesFromReference * 120) % 360; // 120° shift per Saros
+var visibility = getVisibilityFromLongitude(longitude, ref.type);
+
+eclipses.push({
+type: ref.type,
+date: newDay + "." + newMonth + "." + year,
+visibility: visibility,
+sarosInfo: i18n("saros_cycle_info", {
+sarosNumber: ref.sarosNumber,
+cycle: Math.round(cyclesFromReference)
+})
+});
+}
+}
+
+// If no eclipses found through Saros, add statistical approximation
+if (eclipses.length === 0) {
+eclipses = getStatisticalEclipses(year);
+}
+
+// Sort by date
+eclipses.sort(function(a, b) {
+var dateA = new Date(a.date.split('.').reverse().join('-'));
+var dateB = new Date(b.date.split('.').reverse().join('-'));
+return dateA - dateB;
+});
+
+return eclipses;
+}
+
+
+function getVisibilityFromLongitude(longitude, type) {
+var visibilityRegions = {
+solar: [
+"Severní Amerika",
+"Jižní Amerika",
+"Evropa",
+"Afrika",
+"Asie",
+"Austrálie",
+"Pacifik",
+"Atlantik",
+"Arktida",
+"Antarktida"
+],
+lunar: [
+"Celá noční hemisféra",
+"Amerika a západní Evropa",
+"Evropa, Afrika, Asie",
+"Asie, Austrálie, Pacifik",
+"Amerika",
+"Evropa a Afrika"
+]
+};
+
+var regions = type === "Sluneční" ? visibilityRegions.solar: visibilityRegions.lunar;
+var index = Math.floor(longitude / 60) % regions.length;
+
+return regions[index];
+}
+
+
+function getStatisticalEclipses(year) {
+// Fallback statistical method for distant years
+var eclipses = [];
+
+// On average, there are 2-3 solar and 2-3 lunar eclipses per year
+var numSolar = 2;
+var numLunar = 2;
+
+// Generate eclipses based on eclipse seasons (roughly every 6 months)
+var eclipseSeasons = [{
+month: 2 + (year % 3),
+type: i18n("eclipse_solar")
+},
+{
+month: 5 + (year % 2),
+type: i18n("eclipse_lunar")
+},
+{
+month: 8 + (year % 3),
+type: i18n("eclipse_solar")
+},
+{
+month: 11 + (year % 2),
+type: i18n("eclipse_lunar")
+}];
+
+for (var i = 0; i < eclipseSeasons.length && i < 4; i++) {
+var season = eclipseSeasons[i];
+var day = 15 + ((year * 7 + i * 3) % 15) - 7; // Varies between 8-22
+
+if (day < 1) day = 1;
+if (day > 28) day = 28;
+
+eclipses.push({
+type: season.type,
+date: day + "." + season.month + "." + year,
+visibility: i18n("eclipse_statistical_calculation"),
+note: i18n("eclipse_distant_year_approximation")
+});
+}
+
+return eclipses;
+}
+
+
+
+// Corrected Sidereal time calculation with improved timezone handling
+
+function getSiderealTime(day, month, year, hour, minute, longitude, dstOffset) {
+if (dstOffset === undefined) dstOffset = 0;
+
+// Calculate standard timezone from longitude (15° = 1 hour)
+var baseTimezone = Math.round(longitude / 15);
+
+// Apply DST offset
+var totalTimezone = baseTimezone + dstOffset;
+
+// Convert local time to UTC
+var utcHour = hour - totalTimezone;
+var utcMinute = minute;
+
+// Handle day overflow/underflow when converting to UTC
+var utcDay = day;
+var utcMonth = month;
+var utcYear = year;
+
+if (utcHour < 0) {
+utcHour += 24;
+utcDay--;
+if (utcDay < 1) {
+utcMonth--;
+if (utcMonth < 1) {
+utcMonth = 12;
+utcYear--;
+}
+var daysInPrevMonth = [31,
+isLeapYear(utcYear) ? 29: 28,
+31,
+30,
+31,
+30,
+31,
+31,
+30,
+31,
+30,
+31];
+utcDay = daysInPrevMonth[utcMonth - 1];
+}
+} else if (utcHour >= 24) {
+utcHour -= 24;
+utcDay++;
+var daysInMonth = [31,
+isLeapYear(utcYear) ? 29: 28,
+31,
+30,
+31,
+30,
+31,
+31,
+30,
+31,
+30,
+31];
+if (utcDay > daysInMonth[utcMonth - 1]) {
+utcDay = 1;
+utcMonth++;
+if (utcMonth > 12) {
+utcMonth = 1;
+utcYear++;
+}
+}
+}
+
+// USNO Algorithm for Greenwich Mean Sidereal Time
+var jd0 = Math.floor(getJulianDayNumber(utcDay, utcMonth, utcYear)) + 0.5; // Midnight JD
+var H = utcHour + utcMinute / 60.0; // Hours since midnight UTC
+var DUT = jd0 - 2451545.0; // Days since J2000.0 epoch
+var T = DUT / 36525; // Centuries since J2000.0
+
+// Greenwich Mean Sidereal Time (USNO formula)
+var GMST = 6.697375 + 0.065709824279 * DUT + 1.0027379 * H + 0.0000258 * T * T;
+GMST = GMST % 24;
+if (GMST < 0) GMST += 24;
+
+// Local Sidereal Time (add longitude in hours)
+var LST = GMST + longitude / 15;
+LST = LST % 24;
+if (LST < 0) LST += 24;
+
+// Convert GMST to h:m:s format
+var gstH = Math.floor(GMST);
+var gstM = Math.floor((GMST - gstH) * 60);
+var gstS = Math.round(((GMST - gstH) * 60 - gstM) * 60);
+
+if (gstS >= 60) {
+gstM++; gstS = 0;
+}
+if (gstM >= 60) {
+gstH++; gstM = 0;
+}
+
+// Convert LST to h:m:s format
+var lstH = Math.floor(LST);
+var lstM = Math.floor((LST - lstH) * 60);
+var lstS = Math.round(((LST - lstH) * 60 - lstM) * 60);
+
+if (lstS >= 60) {
+lstM++; lstS = 0;
+}
+if (lstM >= 60) {
+lstH++; lstM = 0;
+}
+
+// Create timezone description
+var timezoneDesc = "UTC" + (totalTimezone >= 0 ? "+": "") + totalTimezone;
+if (dstOffset > 0) {
+timezoneDesc += " (" + i18n("sidereal_dst_note") + ")";
+}
+
+return {
+gst: gstH + ":" + (gstM < 10 ? '0': '') + gstM + ":" + (gstS < 10 ? '0': '') + gstS,
+lst: lstH + ":" + (lstM < 10 ? '0': '') + lstM + ":" + (lstS < 10 ? '0': '') + lstS,
+lstDegrees: (LST * 15).toFixed(2) + "°",
+timezone: timezoneDesc,
+utcTime: (utcHour < 10 ? '0': '') + utcHour + ":" + (utcMinute < 10 ? '0': '') + utcMinute
+};
+}
+
+
+// Math type operation toggle
+function toggleMathOperation() {
+var mathType = document.getElementById('mathType').value;
+var addOp = document.getElementById('addOperation');
+var diffOp = document.getElementById('diffOperation');
+
+if (mathType === 'add') {
+addOp.style.display = 'block';
+diffOp.style.display = 'none';
+} else {
+addOp.style.display = 'none';
+diffOp.style.display = 'block';
+}
+clearDisplay();
+}
+
+// Main calculator functions - VŠECHNY ZACHOVANÉ PŘESNĚ
+function calculateDayOfWeek() {
+try {
+var dateInput = document.getElementById('dateInput');
+if (!dateInput) return;
+
+var dateString = dateInput.value.trim();
+if (!dateString) {
+showError(i18n("error_enter_date_any_format"));
+return;
+}
+
+var parsed = parseDate(dateString);
+if (!parsed) {
+showError(i18n("invalid_date_format"));
+return;
+}
+
+var error = validateDate(parsed.day, parsed.month, parsed.year);
+if (error) {
+showError(error);
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var result = getDayOfWeek(parsed.day, parsed.month, parsed.year);
+showResult(result);
+}, 300);
+} catch (e) {
+showError(i18n("calculation_error"));
+}
+}
+
+// Optimalizovaná funkce calculateYearFinder
+function calculateYearFinder() {
+var day = parseInt(document.getElementById('yearFinderDay').value);
+var month = parseInt(document.getElementById('yearFinderMonth').value);
+var dayOfWeek = parseInt(document.getElementById('yearFinderDayOfWeek').value);
+
+if (!day || !month || isNaN(dayOfWeek)) {
+showError(i18n("fill_all_fields"));
+return;
+}
+
+if (day < 1 || day > 31 || month < 1 || month > 12) {
+showError(i18n("invalid_day_or_month"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var years = [];
+
+for (var year = 2000; year <= 2100; year++) {
+var daysInMonth = [31,
+isLeapYear(year) ? 29: 28,
+31,
+30,
+31,
+30,
+31,
+31,
+30,
+31,
+30,
+31];
+
+if (day <= daysInMonth[month - 1]) {
+var me = month,
+rr = year;
+if (month < 3) {
+me = month + 12;
+rr = year - 1;
+}
+var k = rr % 100;
+var j = Math.floor(rr / 100);
+var h = ((day + Math.floor((13 * (me + 1)) / 5) + k + Math.floor(k / 4) + Math.floor(j / 4) - (2 * j)) % 7 + 7) % 7;
+var calculatedDayOfWeek = (h + 6) % 7;
+
+if (calculatedDayOfWeek === dayOfWeek) {
+var leapIndicator = isLeapYear(year) ? ' <strong>(' + i18n("leap_year") + ')</strong>': '';
+years.push(year + leapIndicator);
+}
+}
+}
+
+if (years.length > 0) {
+// Použití optimalizované funkce getWeekdayName
+var weekdayName = getWeekdayName(dayOfWeek, false);
+var result = '<strong>' + i18n("year_finder_result", {
+day: day,
+month: month,
+weekday: weekdayName
+}) + '</strong><br><small>' + years.join(', ') + '</small>';
+showResult(result);
+} else {
+showResult(i18n("year_finder_no_results"));
+}
+},
+300);
+}
+function calculateConverter() {
+var dateStr = document.getElementById('converterDate').value.trim();
+var type = document.getElementById('converterType').value;
+
+if (!dateStr) {
+showError(i18n("enter_date"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var result = '';
+if (type === 'gregorian') {
+// Gregoriánský → Juliánský
+var julianDay = getJulianDayNumber(parsed.day, parsed.month, parsed.year);
+var julianDate = getDateFromJulianDay(julianDay, true);
+var julianJDN = getJulianDayNumber(parsed.day, parsed.month, parsed.year, true);
+var rozdil = julianDay - julianJDN;
+
+result = '<strong>' + i18n("converter_gregorian_label") + '</strong> ' + parsed.day + '.' + parsed.month + '.' + parsed.year +
+'<br><strong>' + i18n("converter_julian_label") + '</strong> ' + julianDate.day + '.' + julianDate.month + '.' + julianDate.year +
+'<br><small>' + i18n("converter_difference", {
+days: rozdil
+}) + '</small>';
+} else {
+// Juliánský → Gregoriánský
+var julianDay = getJulianDayNumber(parsed.day, parsed.month, parsed.year, true);
+var gregorianDate = getDateFromJulianDay(julianDay, false);
+var gregJDN = getJulianDayNumber(parsed.day, parsed.month, parsed.year);
+var rozdil = gregJDN - julianDay;
+
+result = '<strong>' + i18n("converter_julian_label") + '</strong> ' + parsed.day + '.' + parsed.month + '.' + parsed.year +
+'<br><strong>' + i18n("converter_gregorian_label") + '</strong> ' + gregorianDate.day + '.' + gregorianDate.month + '.' + gregorianDate.year +
+'<br><small>' + i18n("converter_difference", {
+days: rozdil
+}) + '</small>';
+}
+showResult(result);
+},
+300);
+}
+
+
+// Optimalizovaná funkce calculateEaster
+function calculateEaster() {
+var year = parseInt(document.getElementById('easterYear').value);
+
+if (!year || year < 1 || year > 9999) {
+showError(i18n("enter_valid_year"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var easter = getEasterDate(year);
+var ashWednesday = addDays(easter, -46);
+var palmSunday = addDays(easter, -7);
+var goodFriday = addDays(easter, -2);
+var easterMonday = addDays(easter, 1);
+var whiteSunday = addDays(easter, 7);
+
+var result = '<strong>' + i18n("easter_holidays_title", {
+year: year
+}) + '</strong><br>' +
+'<small>' + i18n("easter_ash_wednesday") + ': ' + formatDate(ashWednesday) + '<br>' +
+i18n("easter_palm_sunday") + ': ' + formatDate(palmSunday) + '<br>' +
+i18n("easter_good_friday") + ': ' + formatDate(goodFriday) + '<br>' +
+'<strong>' + i18n("easter_sunday") + ': ' + formatDate(easter) + '</strong><br>' +
+i18n("easter_monday") + ': ' + formatDate(easterMonday) + '<br>' +
+i18n("easter_white_sunday") + ': ' + formatDate(whiteSunday) + '</small>';
+
+showResult(result);
+}, 300);
+}
+
+// Optimalizovaná funkce calculateMoonPhase
+function calculateMoonPhase() {
+var dateStr = document.getElementById('moonDate').value.trim();
+
+if (!dateStr) {
+showError(i18n("enter_date"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var moonAge = getMoonAge(parsed.day, parsed.month, parsed.year);
+var phase = getMoonPhase(moonAge);
+var emoji = getMoonEmoji(moonAge);
+var illumination = Math.abs(Math.cos((moonAge / 29.53058867) * 2 * Math.PI - Math.PI)) * 100;
+
+var result = '<strong>' + parsed.day + '.' + parsed.month + '.' + parsed.year + '</strong><br>' +
+emoji + ' <strong>' + phase + '</strong><br>' +
+'<small>' + i18n("moon_age_days", {
+age: moonAge.toFixed(1)}) + '<br>' +
+i18n("moon_illumination", {
+percent: illumination.toFixed(1)}) + '</small>';
+
+showResult(result);
+}, 300);
+}
+
+function calculateDateMath() {
+var mathType = document.getElementById('mathType').value;
+
+if (mathType === 'add') {
+// Přičítání/odčítání dnů
+var dateStr = document.getElementById('mathDate1').value.trim();
+var days = parseInt(document.getElementById('mathDays').value);
+
+if (!dateStr || isNaN(days)) {
+showError(i18n("enter_date_and_days"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var resultDate = addDays(parsed, days);
+var dayOfWeek = getDayOfWeekSimple(resultDate.day, resultDate.month, resultDate.year);
+
+// Lokalizovaný výstup pro přičítání/odčítání
+var operation = days >= 0 ? '+': '';
+var result = '<strong>' + parsed.day + '.' + parsed.month + '.' + parsed.year +
+' ' + operation + days + ' ' + i18n("days_label") + ':</strong><br>' +
+'<strong>' + resultDate.day + '.' + resultDate.month + '.' + resultDate.year + '</strong><br>' +
+'<small>' + dayOfWeek + '</small>';
+
+showResult(result);
+}, 300);
+} else {
+// Rozdíl mezi daty
+var dateStr1 = document.getElementById('mathDate2').value.trim();
+var dateStr2 = document.getElementById('mathDate3').value.trim();
+
+if (!dateStr1 || !dateStr2) {
+showError(i18n("enter_both_dates"));
+return;
+}
+
+var parsed1 = parseDate(dateStr1);
+var parsed2 = parseDate(dateStr2);
+
+if (!parsed1 || !parsed2) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var jd1 = getJulianDayNumber(parsed1.day, parsed1.month, parsed1.year);
+var jd2 = getJulianDayNumber(parsed2.day, parsed2.month, parsed2.year);
+var diff = Math.abs(jd2 - jd1);
+
+var years = Math.floor(diff / 365.25);
+var weeks = Math.floor(diff / 7);
+var remainingDays = diff % 7;
+
+// Lokalizovaný výstup pro rozdíl dat
+var result = '<strong>' + i18n("date_difference_title") + '</strong><br>' +
+parsed1.day + '.' + parsed1.month + '.' + parsed1.year + ' ' + i18n("and") + ' ' +
+parsed2.day + '.' + parsed2.month + '.' + parsed2.year + '<br>' +
+'<strong>' + diff + ' ' + i18n("days_count") + '</strong><br>' +
+'<small>' + i18n("date_math_weeks_days", {
+weeks: weeks, days: remainingDays
+}) + '<br>' +
+i18n("date_math_approximately_years", {
+years: years
+}) + '</small>';
+
+showResult(result);
+}, 300);
+}
+}
+
+
+// Calculate sun events
+function calculateSunEventsFunc() {
+var dateStr = document.getElementById('sunEventsDate').value.trim();
+var latitude = parseFloat(document.getElementById('latitude').value);
+var longitude = parseFloat(document.getElementById('longitude').value);
+
+if (!dateStr) {
+showError(i18n("enter_date"));
+return;
+}
+
+if (isNaN(latitude) || isNaN(longitude)) {
+showError(i18n("enter_valid_coordinates"));
+return;
+}
+
+if (latitude < -90 || latitude > 90) {
+showError(i18n("latitude_range"));
+return;
+}
+
+if (longitude < -180 || longitude > 180) {
+showError(i18n("longitude_range"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var sunEvents = calculateSunEvents(parsed.day, parsed.month, parsed.year, latitude, longitude);
+
+// Debug info for timezone calculation
+var debugTimezone = determineTimezone(longitude, parsed.month);
+var isDSTDebug = parsed.month > 3 && parsed.month < 10 ||
+(parsed.month === 3) ||
+(parsed.month === 10 && false); // October simplified to no DST
+
+// Lokalizovaný hlavní nadpis
+var result = '<strong>' + i18n("sun_events_title_date", {
+date: parsed.day + '.' + parsed.month + '.' + parsed.year
+}) + '</strong><br>';
+
+if (sunEvents.polarNight) {
+result += '<strong>🌑 ' + i18n("polar_night") + '</strong><br>' +
+'<small>' + i18n("polar_night_explanation") + '<br>' +
+i18n("sun_declination") + ': ' + sunEvents.declination + '</small>';
+} else if (sunEvents.polarDay) {
+result += '<strong>🌞 ' + i18n("polar_day") + '</strong><br>' +
+'<small>' + i18n("polar_day_explanation") + '<br>' +
+i18n("sun_declination") + ': ' + sunEvents.declination + '</small>';
+} else {
+result += '<strong>🌅 ' + i18n("sunrise") + ':</strong> ' + sunEvents.sunrise + '<br>' +
+'<strong>🌇 ' + i18n("sunset") + ':</strong> ' + sunEvents.sunset + '<br>' +
+'<strong>⏱️ ' + i18n("day_length") + ':</strong> ' + sunEvents.dayLength + '<br>' +
+'<small>📍 ' + i18n("coordinates", {
+lat: latitude.toFixed(4), lon: longitude.toFixed(4)}) + '<br>' +
+'☀️ ' + i18n("sun_declination") + ': ' + sunEvents.declination + '<br>';
+
+if (sunEvents.eqTime) {
+result += '⏰ ' + i18n("equation_of_time") + ': ' + sunEvents.eqTime + '<br>';
+}
+if (sunEvents.timezone) {
+result += '🕐 ' + i18n("timezone_label") + ': ' + sunEvents.timezone;
+
+// Lokalizované názvy měsíců
+var monthNames = [
+i18n("january"),
+i18n("february"),
+i18n("march"),
+i18n("april"),
+i18n("may"),
+i18n("june"),
+i18n("july"),
+i18n("august"),
+i18n("september"),
+i18n("october"),
+i18n("november"),
+i18n("december")
+];
+
+
+var monthName = monthNames[parsed.month - 1];
+var dstStatus = isDSTDebug ? i18n("dst_summer_time"): i18n("dst_standard_time");
+result += '<br>📅 ' + i18n("sun_events_month_dst", {
+month: monthName, dst_status: dstStatus
+});
+}
+result += '</small>';
+}
+
+showResult(result);
+},
+300);
+}
+
+// Calculate planet positions
+function calculatePlanetPositionsFunc() {
+var dateStr = document.getElementById('planetDate').value.trim();
+
+if (!dateStr) {
+showError(i18n("enter_date"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+// Get time inputs
+var timeStr = document.getElementById('planetTime').value || "00:00";
+var timezone = parseInt(document.getElementById('planetTimezone').value) || 0;
+var timeParts = timeStr.split(':');
+var hour = parseInt(timeParts[0]) || 0;
+var minute = parseInt(timeParts[1]) || 0;
+
+var planets = getPlanetPositions(parsed.day, parsed.month, parsed.year, hour, minute, timezone);
+
+// Lokalizovaný hlavní nadpis a čas
+var result = '<strong>' + i18n("planet_positions_title", {
+date: parsed.day + '.' + parsed.month + '.' + parsed.year
+}) + '</strong><br>' +
+'<small>' + i18n("planet_positions_time", {
+time: timeStr, timezone: (timezone >= 0 ? '+': '') + timezone
+}) + '</small><br><br>';
+
+for (var i = 0; i < planets.length; i++) {
+var planet = planets[i];
+result += '<strong>' + planet.name + '</strong><br>' +
+'📍 ' + planet.position + '<br>' +
+'📐 ' + i18n("planet_elongation") + ': ' + planet.elongation + '<br>' +
+'⭐ ' + i18n("planet_constellation") + ': ' + planet.constellation + '<br>' +
+'✨ ' + i18n("planet_magnitude") + ': ' + planet.magnitude + '<br>' +
+'👁️ ' + planet.visibility + '<br>' +
+'<small>' + planet.type + '</small><br><br>';
+}
+showResult(result);
+},
+300);
+}
+
+
+
+// Calculate eclipses
+
+function calculateEclipsesFunc() {
+var year = parseInt(document.getElementById('eclipsesYear').value);
+
+if (!year || year < 1000 || year > 3000) {
+showError(i18n("enter_valid_year_1000_3000"));
+return;
+}
+
+showLoading();
+setTimeout(function() {
+var eclipses = getEclipses(year);
+var currentYear = new Date().getFullYear();
+
+var result = '<strong>' + i18n("eclipses_in_year", {
+year: year
+}) + ':</strong><br>';
+
+if (eclipses.length === 0) {
+result += '<small>' + i18n("no_significant_eclipses_this_year") + '</small>';
+} else {
+result += '<small>';
+
+for (var i = 0; i < eclipses.length; i++) {
+var eclipse = eclipses[i];
+result += '<strong>' + eclipse.type + ' ' + i18n("eclipse_label") + ':</strong> ' + eclipse.date + '<br>';
+result += i18n("visibility_label") + ': ' + eclipse.visibility + '<br>';
+
+if (eclipse.sarosInfo) {
+result += '<em>' + eclipse.sarosInfo + '</em><br>';
+}
+if (eclipse.note) {
+result += '<em>' + eclipse.note + '</em><br>';
+}
+
+result += '<br>';
+}
+
+// Add accuracy note
+if (Math.abs(year - currentYear) <= 10) {
+result += '<em>📍 ' + i18n("accurate_data_recent_years") + '</em>';
+} else if (Math.abs(year - currentYear) <= 50) {
+result += '<em>🔬 ' + i18n("saros_cycles_approximation") + '</em>';
+} else {
+result += '<em>📊 ' + i18n("statistical_approximation_check_sources") + '</em>';
+}
+
+result += '</small>';
+}
+
+showResult(result);
+},
+300);
+}
+
+
+// Calculate sidereal time
+
+function calculateSiderealTimeFunc() {
+var dateStr = document.getElementById('siderealDate').value.trim();
+var timeStr = document.getElementById('siderealTime').value;
+var longitude = parseFloat(document.getElementById('siderealLongitude').value);
+var dstOffset = parseInt(document.getElementById('siderealDST').value) || 0;
+
+if (!dateStr || !timeStr) {
+showError(i18n("enter_date_and_time"));
+return;
+}
+
+if (isNaN(longitude)) {
+showError(i18n("enter_valid_longitude"));
+return;
+}
+
+var parsed = parseDate(dateStr);
+if (!parsed) {
+showError(i18n("invalid_date_format_short"));
+return;
+}
+
+var timeParts = timeStr.split(':');
+var hour = parseInt(timeParts[0]);
+var minute = parseInt(timeParts[1]);
+
+showLoading();
+setTimeout(function() {
+var sidereal = getSiderealTime(parsed.day, parsed.month, parsed.year, hour, minute, longitude, dstOffset);
+
+var result = '<strong>' + i18n("sidereal_time_title_date", {
+date: parsed.day + '.' + parsed.month + '.' + parsed.year
+}) + '</strong><br>' +
+'<strong>' + i18n("local_time_label") + ':</strong> ' + hour + ':' + (minute < 10 ? '0': '') + minute + ' (' + sidereal.timezone + ')<br>' +
+'<strong>' + i18n("utc_time_label") + ':</strong> ' + sidereal.utcTime + '<br>' +
+'<strong>' + i18n("greenwich_sidereal_time") + ':</strong> ' + sidereal.gst + '<br>' +
+'<strong>' + i18n("local_sidereal_time") + ':</strong> ' + sidereal.lst + '<br>' +
+'<small>' + i18n("lst_in_degrees") + ': ' + sidereal.lstDegrees + '<br>' +
+i18n("longitude_label") + ': ' + longitude.toFixed(4) + '°<br>' +
+i18n("timezone_info") + ': ' + Math.round(longitude / 15) + (dstOffset ? ' + ' + i18n("dst_abbreviation"): '') + '</small>';
+
+showResult(result);
+}, 300);
+}
+
+
+// Universal safe tap/click handler
+// KOMPLETNÍ OPRAVENÁ FUNKCE addSafeTap
+function addSafeTap(selector, callback) {
+var items = document.querySelectorAll(selector);
+for (var i = 0; i < items.length; i++) {
+(function(item) {
+let touchMoved = false;
+
+item.addEventListener('touchstart', function(e) {
+touchMoved = false;
+}, {
+passive: true
+});
+
+item.addEventListener('touchmove', function(e) {
+touchMoved = true;
+}, {
+passive: true
+});
+
+item.addEventListener('touchend', function(e) {
+if (!touchMoved) {
+// Předej event do callback funkce
+callback(item, e);
+}
+});
+
+item.addEventListener('click',
+function(e) {
+// Předej event do callback funkce
+callback(item, e);
+});
+})(items[i]);
+}
+}
+// Application initialization with dynamic cache name loading
+
+
+// Test i18n systému - vložit před initializeApp() fixed
+// Najděte v index.html testI18n funkci a nahraďte ji:
+function testI18n() {
+// Kontrola dostupnosti před testem
+if (!window.i18n || !window.i18nReady || !window.i18nReady()) {
+console.log('i18n není připraven pro test');
+return;
+}
+
+console.log('=== i18n Test Start ===');
+console.log('Current lang:', window.currentLang());
+console.log('i18n ready:', window.i18nReady());
+console.log('App title:', i18n('app_title'));
+
+// Aktualizované klíče pro test
+console.log('Weekday test:', i18n('weekday_monday'));
+console.log('Month test:', i18n('month_january'));
+console.log('Param test:', i18n('easter_holidays_title', {
+year: 2025
+}));
+console.log('Error test:', i18n('nonexistent_key')); // Měl by vrátit [nonexistent_key]
+
+console.log('Available keys count:', Object.keys(window.i18nData || {}).length);
+console.log('Sample keys:', Object.keys(window.i18nData || {}).slice(0, 5));
+console.log('=== i18n Test End ===');
+}
+
+// Application initialization with dynamic cache name loading
+// Najděte v initializeApp() tuto část:
+// testI18n();  // <-- ODSTRAŇTE tuto řádku
+
+// Input handling - nová funkce
+function setupKeyboardHandling() {
+var inputs = document.querySelectorAll('input[type="text"], input[type="time"], input[type="number"]');
+
+for (var i = 0; i < inputs.length; i++) {
+(function(input) {
+input.addEventListener('keypress', function(e) {
+if (e.key === 'Enter' || e.keyCode === 13) {
+e.preventDefault();
+input.blur();
+
+if (window.innerWidth <= 768) {
+setTimeout(function() {
+window.scrollTo(0, 0);
+}, 100);
+}
+}
+});
+
+input.addEventListener('blur',
+function() {
+if (window.innerWidth <= 768) {
+setTimeout(function() {
+if (window.pageYOffset > 0) {
+window.scrollTo({
+top: 0,
+behavior: 'smooth'
+});
+}
+},
+100);
+}
+});
+
+if (input.type === 'time') {
+input.addEventListener('change', function() {
+input.blur();
+});
+}
+})(inputs[i]);
+}
+}
+
+function initializeApp() {
+try {
+console.log('Initializing app...');
+
+// NEJDŘÍVE zkontroluj, že DOM elementy existují
+// Menu button - JEDNODUCHÁ VERZE
+var menuButton = document.getElementById('menuButton');
+var overlay = document.getElementById('menuOverlay');
+
+if (menuButton) {
+// Pouze jeden event listener
+menuButton.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+toggleMenu();
+});
+}
+
+// Overlay handling
+if (overlay) {
+overlay.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+if (isMenuOpen) {
+toggleMenu();
+}
+});
+}
+
+// Escape key handling
+document.addEventListener('keydown',
+function(e) {
+if (e.key === 'Escape' && isMenuOpen) {
+toggleMenu();
+}
+});
+
+// Menu items - JEDNODUCHÁ VERZE
+var dayOfWeekMenu = document.getElementById('dayOfWeekMenu');
+if (dayOfWeekMenu) {
+dayOfWeekMenu.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+showCalculator('dayOfWeek');
+});
+}
+
+var calculatorsMenu = document.getElementById('calculatorsMenu');
+if (calculatorsMenu) {
+calculatorsMenu.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+toggleSubmenu('calculatorsSubmenu');
+});
+}
+
+var astronomyMenu = document.getElementById('astronomyMenu');
+if (astronomyMenu) {
+astronomyMenu.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+toggleSubmenu('astronomySubmenu');
+});
+}
+
+// PŘIDAT tuto sekci: 
+var themesMenu = document.getElementById('themesMenu');
+if (themesMenu) {
+    themesMenu.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSubmenu('themesSubmenu');
+    });
+}
+
+
+// Calculator menu items
+var calcItems = document.querySelectorAll('[data-calculator]');
+for (var i = 0; i < calcItems.length; i++) {
+(function(item) {
+var calc = item.getAttribute('data-calculator');
+item.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+showCalculator(calc);
+});
+})(calcItems[i]);
+}
+
+// Theme items - JEDNODUCHÁ VERZE
+var themeItems = document.querySelectorAll('.theme-item');
+for (var i = 0; i < themeItems.length; i++) {
+(function(item) {
+item.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+var theme = item.getAttribute('data-theme') || '';
+changeTheme(theme);
+});
+})(themeItems[i]);
+}
+
+// Version button
+var versionButton = document.getElementById('versionButton');
+if (versionButton) {
+versionButton.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+showVersion();
+});
+}
+
+// Back buttons
+var backButtons = document.querySelectorAll('[data-back]');
+for (var i = 0; i < backButtons.length; i++) {
+backButtons[i].addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+showCalculator('dayOfWeek');
+});
+}
+
+// Link items
+var linkItems = document.querySelectorAll('[data-link]');
+for (var i = 0; i < linkItems.length; i++) {
+(function(item) {
+item.addEventListener('click', function(e) {
+e.preventDefault();
+e.stopPropagation();
+var link = item.getAttribute('data-link');
+openLink(link);
+});
+})(linkItems[i]);
+}
+// Link items
+var linkItems = document.querySelectorAll('[data-link]');
+for (var i = 0; i < linkItems.length; i++) {
+(function(item) {
+item.addEventListener('click', function(e) {
+console.log('Link item clicked');
+e.preventDefault();
+e.stopPropagation();
+var link = item.getAttribute('data-link');
+openLink(link);
+});
+})(linkItems[i]);
+}
+
+// Input focus tracking
+var inputs = document.querySelectorAll('input[type="text"], input[type="number"], input[type="time"]');
+for (var i = 0; i < inputs.length; i++) {
+(function(input) {
+input.addEventListener('focus', function() {
+activeInput = input;
+}, {
+passive: true
+});
+input.addEventListener('input', clearDisplay, {
+passive: true
+});
+input.addEventListener('keypress', function(e) {
+if (e.key === 'Enter' || e.keyCode === 13) {
+e.preventDefault();
+switch (currentCalculator) {
+case 'dayOfWeek':
+calculateDayOfWeek();
+break;
+case 'yearFinder':
+calculateYearFinder();
+break;
+case 'calendarConverter':
+calculateConverter();
+break;
+case 'easter':
+calculateEaster();
+break;
+case 'moonPhase':
+calculateMoonPhase();
+break;
+case 'dateMath':
+calculateDateMath();
+break;
+case 'sunEvents':
+calculateSunEventsFunc();
+break;
+case 'planetPositions':
+calculatePlanetPositionsFunc();
+break;
+case 'eclipses':
+calculateEclipsesFunc();
+break;
+case 'siderealTime':
+calculateSiderealTimeFunc();
+break;
+}
+}
+});
+})(inputs[i]);
+}
+
+// Calculate buttons
+var calculateBtn = document.getElementById('calculateBtn');
+if (calculateBtn) {
+calculateBtn.addEventListener('click', calculateDayOfWeek);
+calculateBtn.addEventListener('touchend', calculateDayOfWeek);
+}
+
+var yearFinderBtn = document.getElementById('yearFinderBtn');
+if (yearFinderBtn) {
+yearFinderBtn.addEventListener('click', calculateYearFinder);
+yearFinderBtn.addEventListener('touchend', calculateYearFinder);
+}
+
+var converterBtn = document.getElementById('converterBtn');
+if (converterBtn) {
+converterBtn.addEventListener('click', calculateConverter);
+converterBtn.addEventListener('touchend', calculateConverter);
+}
+
+var easterBtn = document.getElementById('easterBtn');
+if (easterBtn) {
+easterBtn.addEventListener('click', calculateEaster);
+easterBtn.addEventListener('touchend', calculateEaster);
+}
+
+var moonBtn = document.getElementById('moonBtn');
+if (moonBtn) {
+moonBtn.addEventListener('click', calculateMoonPhase);
+moonBtn.addEventListener('touchend', calculateMoonPhase);
+}
+
+var dateMathBtn = document.getElementById('dateMathBtn');
+if (dateMathBtn) {
+dateMathBtn.addEventListener('click', calculateDateMath);
+dateMathBtn.addEventListener('touchend', calculateDateMath);
+}
+
+// Astronomy calculator buttons
+var sunEventsBtn = document.getElementById('sunEventsBtn');
+if (sunEventsBtn) {
+sunEventsBtn.addEventListener('click', calculateSunEventsFunc);
+sunEventsBtn.addEventListener('touchend', calculateSunEventsFunc);
+}
+
+var planetBtn = document.getElementById('planetBtn');
+if (planetBtn) {
+planetBtn.addEventListener('click', calculatePlanetPositionsFunc);
+planetBtn.addEventListener('touchend', calculatePlanetPositionsFunc);
+}
+
+var eclipsesBtn = document.getElementById('eclipsesBtn');
+if (eclipsesBtn) {
+eclipsesBtn.addEventListener('click', calculateEclipsesFunc);
+eclipsesBtn.addEventListener('touchend', calculateEclipsesFunc);
+}
+
+var siderealBtn = document.getElementById('siderealBtn');
+if (siderealBtn) {
+siderealBtn.addEventListener('click', calculateSiderealTimeFunc);
+siderealBtn.addEventListener('touchend', calculateSiderealTimeFunc);
+}
+
+// Math type selector
+var mathType = document.getElementById('mathType');
+if (mathType) {
+mathType.addEventListener('change', toggleMathOperation);
+}
+
+// Example items for day of week calculator
+var exampleItems = document.querySelectorAll('[data-date]');
+for (var i = 0; i < exampleItems.length; i++) {
+(function(item) {
+var date = item.getAttribute('data-date');
+let touchMoved = false;
+item.addEventListener('touchstart', function(e) {
+touchMoved = false;
+});
+item.addEventListener('touchmove', function(e) {
+touchMoved = true;
+});
+item.addEventListener('touchend', function(e) {
+if (!touchMoved) fillDate(date);
+});
+item.addEventListener('click',
+function() {
+fillDate(date);
+});
+})(exampleItems[i]);
+}
+
+// Prevent double tap zoom
+var lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+var now = (new Date()).getTime();
+if (now - lastTouchEnd <= 300) {
+event.preventDefault();
+}
+lastTouchEnd = now;
+},
+false);
+
+// Handle orientation change
+function handleOrientationChange() {
+setTimeout(function() {
+var dropdown = document.getElementById('menuDropdown');
+if (dropdown && isMenuOpen) {
+dropdown.classList.remove('show');
+setTimeout(function() {
+dropdown.classList.add('show');
+}, 50);
+}
+},
+100);
+}
+
+if (window.addEventListener) {
+window.addEventListener('orientationchange', handleOrientationChange, {
+passive: true
+});
+window.addEventListener('resize', handleOrientationChange, {
+passive: true
+});
+}
+
+// Initialize current date for inputs
+var today = new Date();
+var todayStr = today.getDate() + '.' + (today.getMonth() + 1) + '.' + today.getFullYear();
+
+// Set default values for some inputs
+var sunEventsDate = document.getElementById('sunEventsDate');
+if (sunEventsDate && !sunEventsDate.value) {
+sunEventsDate.placeholder = todayStr;
+}
+
+var planetDate = document.getElementById('planetDate');
+if (planetDate && !planetDate.value) {
+planetDate.placeholder = todayStr;
+}
+
+var siderealDate = document.getElementById('siderealDate');
+if (siderealDate && !siderealDate.value) {
+siderealDate.placeholder = todayStr;
+}
+var siderealTime = document.getElementById('siderealTime');
+if (siderealTime && !siderealTime.value) {
+var currentHour = today.getHours();
+var currentMinute = today.getMinutes();
+siderealTime.value = (currentHour < 10 ? '0': '') + currentHour + ':' + (currentMinute < 10 ? '0': '') + currentMinute;
+}
+
+// Set default DST for current season with improved logic
+var siderealDST = document.getElementById('siderealDST');
+if (siderealDST) {
+var currentMonth = today.getMonth() + 1; // 1-12
+// European DST logic: April to September definitely DST, March/October depends on date
+var isDST = false;
+if (currentMonth > 3 && currentMonth < 10) {
+isDST = true; // Definitely DST
+} else if (currentMonth === 3) {
+// In March, assume DST after 25th (simplified)
+isDST = today.getDate() >= 25;
+} else if (currentMonth === 10) {
+// In October, assume DST before 25th (simplified)
+isDST = today.getDate() < 25;
+}
+siderealDST.value = isDST ? "1": "0";
+}
+
+// Dynamic Cache Name Loading and Service Worker Registration
+initServiceWorkerWithDynamicCache();
+
+// Enhanced fallback cache system for unsupported browsers
+if (!('serviceWorker' in navigator) || !('caches' in window)) {
+console.log('❌ Service Workers not supported');
+showOfflineFallback();
+setupFallbackCache();
+}
+
+// Orientace handling
+window.addEventListener('orientationchange', function() {
+setTimeout(function() {
+if (isMenuOpen) {
+var dropdown = document.getElementById('menuDropdown');
+if (dropdown && window.innerWidth <= 600) {
+dropdown.style.position = 'fixed';
+dropdown.style.top = '70px';
+dropdown.style.right = '10px';
+dropdown.style.left = '10px';
+} else if (dropdown) {
+dropdown.style.position = 'absolute';
+dropdown.style.top = '50px';
+dropdown.style.right = '0';
+dropdown.style.left = 'auto';
+}
+}
+},
+200);
+});
+
+// Volání keyboard handling
+setupKeyboardHandling();
+
+console.log('✅ Application initialization completed successfully');
+
+} catch (error) {
+console.log('❌ Initialization error:', error);
+// Retry after a short delay
+setTimeout(initializeApp, 500);
+}
+}
+// Dynamic cache name loading and service worker initialization
+
+let currentCacheName = 'calendar-calculator-loading';
+let swRegistration = null;
+let isSwReady = false;
+
+
+
+function initServiceWorkerWithDynamicCache() {
+if (!('serviceWorker' in navigator)) {
+console.log('SW: Not supported');
+showOfflineFallback();
+return;
+}
+
+console.log('SW: Starting registration...');
+
+navigator.serviceWorker.register('./sw.js', {
+scope: './'
+})
+.then(function(registration) {
+swRegistration = registration;
+console.log('SW: Registration successful:', registration.scope);
+
+if (registration.installing) {
+console.log('SW: Installing...');
+trackWorkerState(registration.installing);
+} else if (registration.waiting) {
+console.log('SW: Update available');
+showUpdateAvailable(true);
+} else if (registration.active) {
+console.log('SW: Active immediately');
+handleActiveWorker(registration.active);
+}
+
+registration.addEventListener('updatefound', function() {
+console.log('SW: Update found');
+trackWorkerState(registration.installing);
+});
+
+return registration;
+})
+.catch(function(error) {
+console.error('SW: Registration failed:', error);
+showOfflineFallback();
+});
+}
+
+function trackWorkerState(worker) {
+worker.addEventListener('statechange',
+function() {
+console.log('SW: State changed to:', worker.state);
+
+switch (worker.state) {
+case 'installed':
+if (navigator.serviceWorker.controller) {
+console.log('SW: Update available');
+showUpdateAvailable(false);
+} else {
+console.log('SW: First install complete');
+handleActiveWorker(worker);
+}
+break;
+
+case 'activated':
+console.log('SW: Activated');
+handleActiveWorker(worker);
+break;
+}
+});
+}
+
+function handleActiveWorker(worker) {
+isSwReady = true;
+
+navigator.serviceWorker.addEventListener('message',
+function(event) {
+if (!event.data) return;
+
+console.log('SW: Message from worker:', event.data.type);
+
+switch (event.data.type) {
+case 'SW_ACTIVATED':
+currentCacheName = event.data.cacheName;
+console.log('SW: Cache name received:', currentCacheName);
+showOfflineReady();
+break;
+
+case 'UPDATE_AVAILABLE':
+console.log('SW: Update available notification');
+showUpdateAvailable(false);
+break;
+
+case 'CONTENT_UPDATED':
+console.log('SW: Content updated');
+break;
+}
+});
+
+if (currentCacheName === 'calendar-calculator-loading') {
+requestCacheNameFromWorker();
+} else {
+showOfflineReady();
+}
+}
+
+function requestCacheNameFromWorker() {
+if (!navigator.serviceWorker.controller || !isSwReady) {
+console.log('SW: No controller available yet, waiting...');
+setTimeout(requestCacheNameFromWorker, 1000);
+return;
+}
+
+console.log('SW: Requesting cache name...');
+
+const messageChannel = new MessageChannel();
+
+messageChannel.port1.onmessage = function(event) {
+if (event.data && event.data.type === 'CACHE_NAME_RESPONSE') {
+currentCacheName = event.data.cacheName;
+console.log('SW: Cache name received:', currentCacheName);
+
+if (event.data.cacheExists) {
+showOfflineReady();
+} else {
+showCacheBuilding();
+setTimeout(checkCacheStatus, 2000);
+}
+}
+};
+
+navigator.serviceWorker.controller.postMessage({
+type: 'GET_CACHE_NAME'
+}, [messageChannel.port2]);
+
+setTimeout(function() {
+if (currentCacheName === 'calendar-calculator-loading') {
+console.log('SW: Cache name request timeout');
+showOfflineFallback();
+}
+},
+5000);
+}
+
+
+// Check cache status with dynamic cache name
+
+function checkCacheStatus() {
+if (!isSwReady || currentCacheName === 'calendar-calculator-loading') {
+console.log('SW: Not ready for cache check');
+return;
+}
+
+if ('caches' in window) {
+caches.has(currentCacheName)
+.then(function(hasCache) {
+if (hasCache) {
+return caches.match('./');
+}
+throw new Error('Cache not found');
+})
+.then(function(cachedResponse) {
+if (cachedResponse) {
+console.log('SW: Cache verified and working');
+showOfflineReady();
+} else {
+console.log('SW: Cache exists but empty, waiting...');
+setTimeout(checkCacheStatus, 2000);
+}
+})
+.catch(function(error) {
+console.log('SW: Cache check failed:', error);
+showCacheBuilding();
+setTimeout(checkCacheStatus, 3000);
+});
+}
+}
+
+
+
+
+
+
+// Enhanced offline ready notification
+function showOfflineReady() {
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+if (navigator.onLine) {
+// Použít i18n s fallback
+var smartModeText = window.i18nReady ?
+i18n("connection_smart_mode"):
+"✅ Smart mode - okamžité načítání + background aktualizace";
+statusElement.textContent = smartModeText;
+statusElement.className = 'connection-status online';
+setTimeout(function() {
+statusElement.classList.remove('online');
+}, 6000);
+} else {
+statusElement.textContent = '📱 Offline - vše funguje z cache (' + currentCacheName + ')';
+statusElement.className = 'connection-status offline';
+}
+}
+}
+
+// Show cache building notification
+function showCacheBuilding() {
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+statusElement.textContent = '⏳ Příprava smart cache (' + currentCacheName + ')...';
+statusElement.className = 'connection-status offline';
+setTimeout(checkCacheStatus, 3000);
+}
+}
+
+// Show update available notification - non-intrusive or intrusive
+function showUpdateAvailable(intrusive) {
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+if (intrusive) {
+// Major update - show prominently
+statusElement.textContent = '🔄 Nová verze - klikněte pro aktualizaci';
+statusElement.className = 'connection-status online';
+statusElement.style.cursor = 'pointer';
+statusElement.onclick = function() {
+applyUpdate();
+};
+} else {
+// Background update - subtle notification
+statusElement.textContent = '🔄 Aktualizováno na pozadí - pro aktivaci obnovte stránku';
+statusElement.className = 'connection-status online';
+statusElement.style.cursor = 'pointer';
+statusElement.onclick = function() {
+if (confirm('Načíst aktualizovanou verzi aplikace?')) {
+window.location.reload();
+}
+};
+
+// Auto-hide after 8 seconds
+setTimeout(function() {
+if (statusElement.textContent.includes('Aktualizováno na pozadí')) {
+statusElement.classList.remove('online');
+statusElement.style.cursor = 'default';
+statusElement.onclick = null;
+}
+},
+8000);
+}
+}
+}
+
+// Apply update function
+function applyUpdate() {
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+statusElement.textContent = '⏳ Aplikuje se aktualizace...';
+statusElement.className = 'connection-status offline';
+statusElement.style.cursor = 'default';
+statusElement.onclick = null;
+}
+
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.controller.postMessage({
+type: 'SKIP_WAITING'
+});
+}
+
+setTimeout(function() {
+window.location.reload();
+}, 500);
+}
+
+// Enhanced connection monitoring
+function setupSmartConnectionMonitoring() {
+function updateConnectionDisplay() {
+var statusElement = document.getElementById('connectionStatus');
+if (!statusElement) return;
+
+if (navigator.onLine) {
+// Don't show online status if we're already showing other info
+if (!statusElement.textContent ||
+statusElement.textContent.includes('Offline')) {
+statusElement.textContent = '🌐 Online - background aktualizace aktivní';
+statusElement.className = 'connection-status online';
+setTimeout(function() {
+statusElement.classList.remove('online');
+}, 3000);
+}
+} else {
+statusElement.textContent = '📱 Offline - vše funguje z cache (' + currentCacheName + ')';
+statusElement.className = 'connection-status offline';
+}
+}
+
+
+window.addEventListener('online', updateConnectionDisplay, {
+passive: true
+});
+window.addEventListener('offline', updateConnectionDisplay, {
+passive: true
+});
+}
+
+// Manual update check function
+function checkForUpdates() {
+if (navigator.serviceWorker.controller) {
+navigator.serviceWorker.controller.postMessage({
+type: 'CHECK_UPDATES'
+});
+
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+statusElement.textContent = '🔍 Kontrola aktualizací...';
+statusElement.className = 'connection-status online';
+
+setTimeout(function() {
+statusElement.classList.remove('online');
+}, 2000);
+}
+}
+}
+
+// Fallback for unsupported browsers
+function showOfflineFallback() {
+setupFallbackCache();
+var statusElement = document.getElementById('connectionStatus');
+if (statusElement) {
+statusElement.textContent = '⚠️ Základní cache (prohlížeč nepodporuje PWA)';
+statusElement.className = 'connection-status offline';
+}
+}
+
+// Enhanced fallback cache system
+function setupFallbackCache() {
+console.log('📦 Setting up enhanced fallback cache');
+
+try {
+if (hasLocalStorage) {
+var appData = {
+html: document.documentElement.outerHTML,
+timestamp: Date.now(),
+version: 'v1.4-fallback'
+};
+
+localStorage.setItem('offline-calendar-app', JSON.stringify(appData));
+console.log('✅ Enhanced fallback cache created');
+}
+} catch (e) {
+console.log('❌ Fallback cache failed:', e);
+}
+
+window.addEventListener('beforeunload', function() {
+try {
+if (hasLocalStorage && navigator.onLine) {
+var appData = {
+html: document.documentElement.outerHTML,
+timestamp: Date.now(),
+version: 'v1.4-fallback'
+};
+localStorage.setItem('offline-calendar-app', JSON.stringify(appData));
+}
+} catch (e) {}
+});
+}
+
+// Initialize app when DOM is ready
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+initializeApp();
+}
+
+})();
+</script>
+
+<script>
+// ...váš dosavadní JS kód...
+
+// =======================
+// POZOR! Před každou přímou prací s cache (caches.open, caches.match, caches.delete, atd.)
+// NEZAPOMEŇ vložit kontrolu, že currentCacheName !== "Cache Name Not Yet Defined".
+// Jinak riskujete, že vytvoříte dummy cache nebo spustíte operaci se špatným názvem!
+// Viz diskuse ChatGPT 2024-08-28.
+// =======================
+
+function safeCacheAction(action) {
+if (currentCacheName === "Cache Name Not Yet Defined") {
+console.error("Nelze provést operaci: cache name není známo!");
+return Promise.reject("Invalid cache name");
+}
+return caches.open(currentCacheName).then(action);
+}
+
+</script>
+
+</body>
+</html>
