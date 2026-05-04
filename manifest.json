@@ -2,8 +2,9 @@
   "name": "Kalendářní kalkulátor - Rozšířený",
   "short_name": "Kalendář PWA",
   "description": "Komplexní kalendářní kalkulátor s astronomickými funkcemi - plná offline funkcionalita",
-  "start_url": "./",
-  "id": "PWA-Calendar-Calc",
+  "id": "/PWA-Calendar-Calc/",
+  "start_url": "/PWA-Calendar-Calc/",
+  "scope": "/PWA-Calendar-Calc/",
   "display": "standalone",
   "background_color": "#4A4A3A",
   "theme_color": "#8B7355",
@@ -16,35 +17,6 @@
   ],
   "lang": "cs",
   "dir": "ltr",
-  "scope": "/PWA-Calendar-Calc/",
-  "shortcuts": [
-    {
-      "name": "Den v týdnu",
-      "short_name": "Den v týdnu",
-      "description": "Rychlý výpočet dne v týdnu",
-      "url": "./?view=dayofweek",
-      "icons": [
-        {
-          "src": "/PWA-Calendar-Calc/icons/shortcut-day-of-week-96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Astronomie",
-      "short_name": "Astronomie",
-      "description": "Astronomické výpočty",
-      "url": "./?view=astronomy",
-      "icons": [
-        {
-          "src": "/PWA-Calendar-Calc/icons/shortcut-astronomy-96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
   "icons": [
     {
       "src": "/PWA-Calendar-Calc/icons/icon-512.png",
@@ -77,73 +49,37 @@
       "purpose": "any"
     }
   ],
-  "screenshots": [],
-  "prefer_related_applications": false,
-  "related_applications": [],
-  "iarc_rating_id": "",
-  "handle_links": "preferred",
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "protocol_handlers": [],
-  "file_handlers": []
-}    },
+  "shortcuts": [
     {
-      "src": "/PWA-Calendar-Calc/icons/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
+      "name": "Den v týdnu",
+      "short_name": "Den v týdnu",
+      "description": "Rychlý výpočet dne v týdnu",
+      "url": "/PWA-Calendar-Calc/?view=dayofweek",
+      "icons": [
+        {
+          "src": "/PWA-Calendar-Calc/icons/shortcut-day-of-week-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     },
     {
-      "src": "/PWA-Calendar-Calc/icons/icon-48.png",
-      "sizes": "48x48",
-      "type": "image/png",
-      "purpose": "any"
+      "name": "Astronomie",
+      "short_name": "Astronomie",
+      "description": "Astronomické výpočty",
+      "url": "/PWA-Calendar-Calc/?view=astronomy",
+      "icons": [
+        {
+          "src": "/PWA-Calendar-Calc/icons/shortcut-astronomy-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
     }
   ],
   "screenshots": [],
   "prefer_related_applications": false,
   "related_applications": [],
-  "iarc_rating_id": "",
-  "handle_links": "preferred",
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "protocol_handlers": [],
-  "file_handlers": []
-}    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDgiIGZpbGw9IiM4QjczNTUiLz4KPHR4dCB4PSI5NiIgeT0iMTI4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXNpemU9IjcyIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfkIU8L3RleHQ+Cjwvc3ZnPgo=",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0IiBoZWlnaHQ9IjE0NCIgdmlld0JveD0iMCAwIDE0NCAxNDQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNDQiIGhlaWdodD0iMTQ0IiByeD0iMzYiIGZpbGw9IiM4QjczNTUiLz4KPHR4dCB4PSI3MiIgeT0iOTYiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWkiIGZvbnQtc2l6ZT0iNTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QhTwvdHh0Pgo8L3N2Zz4K",
-      "sizes": "144x144",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNzIiIHZpZXdCb3g9IjAgMCA3MiA3MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcyIiBoZWlnaHQ9IjcyIiByeD0iMTgiIGZpbGw9IiM4QjczNTUiLz4KPHR4dCB4PSIzNiIgeT0iNDgiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWkiIGZvbnQtc2l6ZT0iMjciIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QhTwvdHh0Pgo8L3N2Zz4K",
-      "sizes": "72x72",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiM4QjczNTUiLz4KPHR4dCB4PSIyNCIgeT0iMzIiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWkiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QhTwvdHh0Pgo8L3N2Zz4K",
-      "sizes": "48x48",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "screenshots": [],
-  "prefer_related_applications": false,
-  "related_applications": [],
-  "iarc_rating_id": "",
-  "handle_links": "preferred",
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
   "protocol_handlers": [],
   "file_handlers": []
 }
