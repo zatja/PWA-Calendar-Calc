@@ -3,7 +3,7 @@
   "short_name": "Kalendář PWA",
   "description": "Komplexní kalendářní kalkulátor s astronomickými funkcemi - plná offline funkcionalita",
   "start_url": "./",
-  "id": "calendar-calculator",
+  "id": "PWA-calendar-calc",
   "display": "standalone",
   "background_color": "#4A4A3A",
   "theme_color": "#8B7355",
